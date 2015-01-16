@@ -28,7 +28,6 @@ bool Options::UseDirectx;
 int  Options::Framerate;
 int  Options::CurrentMode;
 int  Options::CombatVerbose;
-int  Options::ColorDepth;
 int  Options::IconCache;
 std::string Options::ModDirectory;
 Options::Options() {
@@ -43,7 +42,6 @@ Options::Options(bool reset) {
           UseDirectx=true;
           Framerate=60;
           CombatVerbose=COMBAT_VERBOSE;
-          ColorDepth=24;
 		IconCache=100;
           ModDirectory="default";
 
@@ -91,9 +89,6 @@ void Options::ProcessTag(IlluvienXMLTag Tag) {
      else if(Tag.Name=="combatverbose") {
           CombatVerbose=StringToInt(Tag.Data);
      }
-     else if(Tag.Name=="colordepth") {
-          ColorDepth=StringToInt(Tag.Data);
-     }
 	else if(Tag.Name=="iconcache") {
 		IconCache=StringToInt(Tag.Data);
 	}
@@ -123,9 +118,6 @@ void Options::SaveOptions() {
      File<<"    <combatverbose>";
      File<<CombatVerbose;
      File<<"</combatverbose>\n";
-     File<<"    <colordepth>";
-     File<<ColorDepth;
-     File<<"</colordepth>\n";
 	File<<"    <iconcache>";
 	File<<IconCache;
 	File<<"</iconcache>\n";

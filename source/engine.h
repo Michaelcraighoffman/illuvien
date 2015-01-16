@@ -24,7 +24,8 @@
 #ifndef   ENGINE_H
 #define   ENGINE_H
 
-#include <allegro.h>
+#include "SDL.h"
+
 #include "anim.h"
 #include "map.h"
 #include "player.h"
@@ -38,38 +39,49 @@ class GameEngine {
      protected:
           /*! Errorhandler for Errors in the engine */
           ErrorHandler * Error;
+
           /*! Class to measure FPS */
           FPSTimer * FPS;
-          /*! Current Player Position, stored locally from Player */
-          Point PlayerPosition;
+
           /*! Last recorded position of mouse, for performance */
           Point LastMouse;
+
           /*! Point containing the top left coordinate of the drawn screen.
               Enables the screen to be drawn such that the player is centered
               and transformation of mouse coordinates to game coordinates */ 
           Point Actual;
-          /*! Boolean recording whether some action has occured such that the game
-              needs to be shut down gracefully*/ 
-          bool GameDone;
-          /*! Local Options Object */
-          Options * Opts;
+
+        /*! Boolean recording whether some action has occured such that the game
+            needs to be shut down gracefully*/ 
+        bool GameDone;
+
+        /*! Local Options Object */
+        Options * Opts;
+
+        /*! The SDL Window we're drawing to */
+        SDL_Window * Window;
+
+        /*! The renderer for the SDL Window */
+        SDL_Renderer * Renderer;
      public:
-          GameEngine();
+          GameEngine(SDL_Window * activeWindow);
           ~GameEngine();
           /*! Sets up portions of the engine not suitable for the constructor */
           void Setup();
+
           /*! Controls the timing for player and NPC actions */
           void Loop();
-          /*! Rendering loop, called by the pthread functions in main. */
-          bool PThreadRenderLoop();
-          /*! Input loop, called by the pthread functions in main. */
-          bool PThreadInputLoop();
-          /*! Renders the entire screen.  Called from PThreadRenderLoop() */          
-          void Render();
+
+
+          /*! Renders the entire screen.  Called from ThreadRenderLoop() */          
+          void Render(int delta);
+
           /*! Checks for input and routes events accordingly */
           void InputLoop();
+
           /*! Updates player and casues NPC to process actions */
-          void Action();
+          void Action(int delta);
+
           /*! Returns the top left coordinate to begin drawing the screen.
               Enables the screen to be drawn such that the player is centered */ 
           Point GetRenderRect();

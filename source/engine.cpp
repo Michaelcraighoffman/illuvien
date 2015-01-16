@@ -18,23 +18,14 @@
 
 #include "engine.h"
 #include <iostream>
-volatile int InputCounter=0;
-volatile int DrawCounter=0;
-volatile int ActionCounter=0;
-volatile int AnimatorCounter=0;
-void IncrementInputCounter() {
-     InputCounter++;
-}
-void IncrementDrawCounter() {
-     DrawCounter=1;
-}
-void IncrementActionCounter() {
-     ActionCounter++;
-}
-void IncrementAnimatorCounter() {
-     AnimatorCounter++;
-}
-GameEngine::GameEngine() {
+
+/* The number of milliseconds to wait between rendering frames */
+int FrameDelay;
+
+/* The number of milliseconds since the last frame we drew */
+int LastFrame;
+
+GameEngine::GameEngine(SDL_Window * activeWindow) {
      Map=new MapController;
      Error=new ErrorHandler("Engine", ERROR_SEVERITY_LOG, false);
      Player=new PlayerController;
@@ -43,6 +34,7 @@ GameEngine::GameEngine() {
      MonsterManager=new MonsterController;
      MsgBox=new IlluvienMessageBox;
      Opts=new Options;
+    Window=activeWindow;
 }
 
 GameEngine::~GameEngine() {
@@ -55,25 +47,18 @@ GameEngine::~GameEngine() {
      delete MsgBox;
 }
 void GameEngine::Setup() {
-     LOCK_VARIABLE(InputCounter);
-     LOCK_VARIABLE(DrawCounter);
-     LOCK_VARIABLE(ActionCounter);
-     LOCK_VARIABLE(AnimatorCounter);
-     LOCK_FUNCTION(IncrementInputCounter);
-     LOCK_FUNCTION(IncrementDrawCounter);
-     LOCK_FUNCTION(IncrementActionCounter);
-     LOCK_FUNCTION(IncrementAnimatorCounter);
-     install_int_ex(IncrementInputCounter, BPS_TO_TIMER(20));
-     install_int_ex(IncrementActionCounter, BPS_TO_TIMER(5));
-     if(Opts->Framerate > 0) {
-          install_int_ex(IncrementDrawCounter, BPS_TO_TIMER(Opts->Framerate));
-          install_int_ex(IncrementAnimatorCounter, BPS_TO_TIMER(Opts->Framerate));
-     }
+    Renderer=SDL_CreateRenderer(Window, -1, SDL_RENDERER_ACCELERATED|(Opts->UseVsync ? SDL_RENDERER_PRESENTVSYNC : 0));
      Map->LoadMap("synen");
      GameDone=false;
      Player->Setup();
      PlayerPosition=Player->GetPosition();
-
+    if(Opts->Framerate > 0) {
+        FrameDelay=1000/Opts->Framerate;
+    }
+    else {
+        FrameDelay=0;
+    }
+     
      MonsterManager->AddMonster("Immortal Zombie", "Bonegrinder", Point(20, 11), ALLY_FRIENDLY);
      MonsterManager->AddMonster("Immortal Zombie", "Bonegrinder", Point(22, 11), ALLY_FRIENDLY);
      MonsterManager->AddMonster("Guard", "Synen Guard", Point(19, 28), ALLY_FRIENDLY);
@@ -86,65 +71,51 @@ void GameEngine::Setup() {
      MonsterManager->AddMonster("Zombie", "Mindless Servant", Point(21, 15), ALLY_HOSTILE);
 }
 void GameEngine::Loop() {
-     while(!GameDone) {
-         if(ActionCounter > 0) {
-               Action();
-               ActionCounter--;
-         }
-         else rest(1);
+    int last= SDL_GetTicks();
+    int delta=0;
+    while(!GameDone) {
+        delta=SDL_GetTicks()-last;
+        Action(delta);
+        Anim->Update(delta);
+        Render(delta);
+        InputLoop();
+        SDL_Delay(1);
      }
 }
-
-bool GameEngine::PThreadRenderLoop() {
-    if(GameDone)
-	return false;
-    if(DrawCounter > 0 ) {
-        Render();
-        DrawCounter--;
-    }
-    if(AnimatorCounter > 0) {
-        Anim->Update();
-        AnimatorCounter--;
-    }
-    if(Opts->Framerate==0) {
-        DrawCounter=1;
-        AnimatorCounter=1;
-    }
-    if(DrawCounter+AnimatorCounter==0)
-        rest(1);
-
-    return true;
-}
-bool GameEngine::PThreadInputLoop() {
-     if(GameDone)
-	  return false;
-     if(InputCounter > 0) {
-	     InputLoop();
-	     InputCounter--;
+void GameEngine::Render(int delta) {
+     if(FrameDelay>0) {
+        LastFrame+=delta;
+        if(LastFrame<FrameDelay) return;
+        else LastFrame-=FrameDelay;
      }
-     else rest(1);
-     return true;
-}
-void GameEngine::Render() {
      FPS->Frame();
+     SDL_RenderClear(Renderer);
      Actual=GetRenderRect();
-     BITMAP * Buffer=create_bitmap(1024,768);
-     if(!Buffer)
-               Error->ReportError(ERROR_SEVERITY_FATAL, "Could not create Back Buffer");
-     Map->Render(Buffer, Actual);
-     Anim->Render(Buffer, Actual);
-     MonsterManager->Render(Buffer, Actual);
-     MsgBox->Render(Buffer);
-     textprintf_ex(Buffer, font, 0,0, makecol(0,0,0), -1, "%i", FPS->GetFPS());
-     textprintf_ex(Buffer, font, 0,10, makecol(0,0,0), -1, "%i,%i", mouse_x, mouse_y);
-     if(Opts->UseVsync) vsync();
-     blit(Buffer, screen, 0,0,0,0, 1024,768);
-     destroy_bitmap(Buffer);
+     Map->Render(Renderer, Actual);
+     Anim->Render(Renderer, Actual);
+     MonsterManager->Render(Renderer, Actual);
+     MsgBox->Render(Renderer);
+     //textprintf_ex(Buffer, font, 0,0, makecol(0,0,0), -1, "%i", FPS->GetFPS());
+     //textprintf_ex(Buffer, font, 0,10, makecol(0,0,0), -1, "%i,%i", mouse_x, mouse_y);
+     SDL_RenderPresent(renderer);
 }
 
 void GameEngine::InputLoop() {
-     Point NewPosition=PlayerPosition;
-     if(key[KEY_LEFT] || key[KEY_A] || key[KEY_4_PAD]) {
+    SDL_Event event;
+    if(SDL_PollEvent(&event)) {
+        switch(event.type) {
+            case SDL_MOUSEMOTION:
+                if(event.motion.x < 768 && event.motion.y < 640) {
+                    MonsterManager->CreateTooltip(event.motion.x+Actual.x, event.motion.y+Actual.y, Actual.x, Actual.y);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+    const Uint8 *state = SDL_GetKeyboardState(NULL);
+    Point NewPosition=Player->GetPosition();
+     if(state[SDL_SCANCODE_LEFT]) {
           NewPosition.x--;
           if(Map->IsPassable(NewPosition, Player->GetMountStatus())) {
                Player->SetDestination(NewPosition, ANIM_WEST);
@@ -153,7 +124,7 @@ void GameEngine::InputLoop() {
                NewPosition.x++;
           }
      }
-     else if(key[KEY_RIGHT]|| key[KEY_D] || key[KEY_6_PAD]) {
+     else if(state[SDL_SCANCODE_RIGHT]) {
           NewPosition.x++;
           if(Map->IsPassable(NewPosition, Player->GetMountStatus())) {
                Player->SetDestination(NewPosition, ANIM_EAST);
@@ -163,7 +134,7 @@ void GameEngine::InputLoop() {
           }
 
      }
-     else if(key[KEY_UP]|| key[KEY_W] || key[KEY_8_PAD]) {
+     else if(state[SDL_SCANCODE_UP]) {
           NewPosition.y--;
           if(Map->IsPassable(NewPosition, Player->GetMountStatus())) {
                Player->SetDestination(NewPosition, ANIM_NORTH);
@@ -172,7 +143,7 @@ void GameEngine::InputLoop() {
                NewPosition.y++;
           }
      }
-     else if(key[KEY_DOWN]|| key[KEY_S] || key[KEY_2_PAD]) {
+     else if(state[SDL_SCANCODE_DOWN]) {
           NewPosition.y++;
           if(Map->IsPassable(NewPosition, Player->GetMountStatus())) {
                Player->SetDestination(NewPosition, ANIM_SOUTH);
@@ -182,18 +153,14 @@ void GameEngine::InputLoop() {
           }
 
      }
-     else if(key[KEY_ESC])
-          GameDone=true;
-
-     if(mouse_x < 768 && mouse_y < 640) {
-           MonsterManager->CreateTooltip(mouse_x+Actual.x, mouse_y+Actual.y, Actual.x, Actual.y);
-     }
+    if(state[SDL_SCANCODE_ESCAPE]) {
+         GameDone=true;
+    }
 }
 
-void GameEngine::Action() {
-     Player->PlayerAction();
-     MonsterManager->MoveMonsters();
-     PlayerPosition=Player->GetPosition();
+void GameEngine::Action(int delta) {
+     Player->PlayerAction(delta);
+     MonsterManager->MoveMonsters(delta);
 }
 
 Point GameEngine::GetRenderRect() {

@@ -20,6 +20,9 @@
 
 PlayerController * Player;
 
+/* Milliseconds since the last time we updated the Player */
+int LastAction;
+
 PlayerController::PlayerController() {
      Error=new ErrorHandler("Player", ERROR_SEVERITY_LOG, false);
 }
@@ -83,8 +86,12 @@ void PlayerController::SetDestination(Point To, int Anim) {
      Destination=To;
      NewAnim=Anim;
 }
-void PlayerController::PlayerAction() {
-     if(Position!=Destination) {
+void PlayerController::PlayerAction(int delta) {
+    LastAction+=delta;
+    if(LastAction<ENGINE_TICK_MS) { return; }
+    LastAction-=ENGINE_TICK_MS;
+
+    if(Position!=Destination) {
           Anim->UpdateAnimator(AnimationIndex, NewAnim, Destination);
           Position=Destination;
      }

@@ -52,7 +52,7 @@ class PlayerController {
           void SetPosition(Point New);
           void SetAnim(int Anim);
           void SetDestination(Point To, int Anim);
-          void PlayerAction();
+          void PlayerAction(int delta);
           int GetMountStatus();
 
           void DamagePlayer(int Amt);

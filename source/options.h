@@ -36,7 +36,6 @@ class Options {
           static int Framerate;              /* The desired framerate, 0 for unlimitied */
           static int CurrentMode;            /* The current graphics mode we are in */
           static int CombatVerbose;          /* The verbosity of combat messages */
-          static int ColorDepth;             /* The color depth to use */
 		static int IconCache;			/* The number of item icons to keep in memory before deleting */
           static std::string ModDirectory;   /* The current directory to pull files out of */
           Options();
