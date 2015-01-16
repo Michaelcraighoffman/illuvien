@@ -1,7 +1,7 @@
 CC=g++
 OBJECTS = anim.o battle.o engine.o error.o fps.o globals.o inventory.o loadpng.o main.o map.o mapxml.o messagebox.o monsterai.o monsters.o monsters_xml.o options.o player.o regpng.o savepng.o xml.o
-LIBS = -lz -lpng `allegro-config --libs`
-CPPFLAGS = -Wall -O3
+LIBS = -lz -lpng `sdl2-config --cflags --libs`
+CPPFLAGS = -Wall -O3 -std=c++11
 outputdir = ../output/
 
 illuvien : $(OBJECTS)
