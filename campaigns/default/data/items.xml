@@ -1,0 +1,9 @@
+<itemlist>
+     <item>
+          <name>Null</name>
+          <ID>0</ID>
+          <maxstack>500</maxstack>
+          <type>a</type>
+          <icon>0</icon>
+     </item>
+</itemlist>
