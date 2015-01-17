@@ -20,16 +20,15 @@
 #include <cstring>
 #include <iostream>
 #include "SDL.h"
-#include "SDL_thread.h"
-#include "SDL_timer.h"
-
+#include <SDL_ttf.h>
+#include <SDL_image.h>
 #include "options.h"
 #include "error.h"
 #include "engine.h"
 
 GameEngine * Engine;  //Global for threads
 
-bool SetupGraphics(Options opt, SDL_Window *win) {
+bool SetupGraphics(Options opt, SDL_Window * &win) {
      //If the player will allow fullscreen
      ErrorHandler Error("GFXINIT", ERROR_SEVERITY_LOG, false);
      if(opt.UseFullscreen==true)
@@ -41,7 +40,7 @@ bool SetupGraphics(Options opt, SDL_Window *win) {
                 1024,                      
                 768,                       
                 SDL_WINDOW_FULLSCREEN);    
-        if(win != null) return true;
+        if(win != NULL) return true;
         Error.ReportError(ERROR_SEVERITY_LOG, "Could not create Fullscreen DirectX Window");
     }
 		
@@ -52,27 +51,18 @@ bool SetupGraphics(Options opt, SDL_Window *win) {
                1024,                      
                768,                       
                0);    
-    if(win != null) return true;
+    if(win != NULL) return true;
     Error.ReportError(ERROR_SEVERITY_LOG, "Could not create Generic Window");
     //We can't initialize the window
     return false;
 }
-int ThreadRenderRedirect(void * unused) {
-    while(Engine->ThreadRenderLoop()) { }
-    return 0;
-}
-int ThreadInputRedirect(void * unused) {
-    while(Engine->ThreadInputLoop()) { }
-    return 0;
-}
+
 int main(int Argc, char * Argv[]) {
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
-
+    IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
+    TTF_Init();
     Options opts(true);
-
-    SDL_Thread * RenderThread;
-    SDL_Thread * InputThread;
-    SDL_Window * Window;
+    SDL_Window * Window=NULL;
     for(int a=0; a<Argc; a++) {
          if(strcmp(Argv[a], "-nofullscreen")==0)
               opts.UseFullscreen=false;
@@ -90,21 +80,18 @@ int main(int Argc, char * Argv[]) {
 
 
      if(SetupGraphics(opts, Window)) {
+         DefaultRenderer = SDL_CreateRenderer(Window, -1, 0);
           Engine=new GameEngine(Window);
-          enable_hardware_cursor();
-          show_mouse(screen);
+          SDL_ShowCursor(SDL_ENABLE);
           Engine->Setup();
-        RenderThread=SDL_CreateThread(ThreadRenderRedirect, "Render Thread", (void *)NULL);
-        InputThread=SDL_CreateThread(ThreadInputRedirect, "Input Thread", (void *)NULL);
           Engine->Loop();
 	  //Once the engine completes, wait for our render thread to do so before shutting down
-        SDL_WaitThread(RenderThread, NULL);
-        SDL_WaitThread(InputThread, NULL);
           delete Engine;
         SDL_DestroyWindow(Window);
+        TTF_Quit();
+        IMG_Quit();
         SDL_Quit();
           return EXIT_SUCCESS;
      }
      return EXIT_FAILURE;
 }
-END_OF_MAIN()

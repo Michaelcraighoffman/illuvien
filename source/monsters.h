@@ -19,7 +19,8 @@
 #ifndef   MONSTERS_H
 #define   MONSTERS_H
 
-#include <allegro.h>
+#include <SDL.h>
+#include <SDL_image.h>
 #include <string>
 #include <vector>
 #include "globals.h"
@@ -86,7 +87,7 @@ class MonsterController {
           /*! All active Monsters */
           std::vector <Monster> Monsters;
           /*! The current Tooltip */
-          BITMAP * Tooltip;
+          SDL_Texture * Tooltip;
           /*! The location of the tooltip */
           Point TooltipCoords;
           /*! Whether or the tooltip should be rendered */
@@ -111,9 +112,9 @@ class MonsterController {
           /*! Loads all the images associated with the given monster and adds an animator for them. */
           void LoadImages(Monster &Out);
           /*! Cycles through the all the living monsters and calls their appropriate handlers */
-          void MoveMonsters();
+          void MoveMonsters(int Delta);
           /*! Cycles through the all monsters and renders them to the screen */
-          void Render(BITMAP * Buffer, Point At);
+          void Render(Point At);
           /*! Helper function that switches the two given monsters in the vector */
           void SwitchPositions(int a, int b);
           /*! Damages the specified monster by the amount specified, which damage of the type specified */

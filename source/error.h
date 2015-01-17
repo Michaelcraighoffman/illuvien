@@ -18,7 +18,7 @@
 
 #ifndef   ERROR_H
 #define   ERROR_H
-#include <allegro.h>
+#include <SDL.h>
 #include <string>
 #include <fstream>
 

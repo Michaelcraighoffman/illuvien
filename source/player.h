@@ -19,7 +19,7 @@
 #ifndef   PLAYER_H
 #define   PLAYER_H
 
-#include <allegro.h>
+#include <SDL.h>
 #include <string>
 #include "globals.h"
 #include "battle.h"

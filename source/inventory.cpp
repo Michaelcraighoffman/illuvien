@@ -126,7 +126,8 @@ void ItemHandler::ProcessTag(IlluvienXMLTag Tag) {
 	LoadedItems.push_back(Current);
 }
 
-RLE_SPRITE_REF * ItemHandler::LoadIcon(int ID) {
+SPRITE_REF * ItemHandler::LoadIcon(int ID) {
+#ifdef UNIMPLEMENTED
 	for(unsigned int i=0; i<IconCache.size(); i++) {
 		if(IconCache[i]->ID==ID)
 			IconCache[i]->refcount++;
@@ -138,7 +139,7 @@ RLE_SPRITE_REF * ItemHandler::LoadIcon(int ID) {
 	BITMAP * Icons=load_bitmap(Path.c_str(),NULL);
 	BITMAP * In=create_bitmap(32,32);
 	blit(Icons, In, 0, 32*ID, 0,0,32,32);
-	RLE_SPRITE_REF * Ref;
+	SPRITE_REF * Ref;
 	Ref->ID=ID;
 	Ref->refcount=1;
 	Ref->sprite=get_rle_sprite(In);
@@ -147,5 +148,7 @@ RLE_SPRITE_REF * ItemHandler::LoadIcon(int ID) {
 	IconCache.push_back(Ref);
 	delete Opts;
 	return Ref;
+#endif
+    return NULL;
 }
 

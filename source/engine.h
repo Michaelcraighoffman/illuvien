@@ -61,8 +61,6 @@ class GameEngine {
         /*! The SDL Window we're drawing to */
         SDL_Window * Window;
 
-        /*! The renderer for the SDL Window */
-        SDL_Renderer * Renderer;
      public:
           GameEngine(SDL_Window * activeWindow);
           ~GameEngine();
@@ -77,7 +75,7 @@ class GameEngine {
           void Render(int delta);
 
           /*! Checks for input and routes events accordingly */
-          void InputLoop();
+          void InputLoop(int delta);
 
           /*! Updates player and casues NPC to process actions */
           void Action(int delta);

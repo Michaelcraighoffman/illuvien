@@ -18,7 +18,8 @@
 
 #ifndef   GLOBALS_H
 #define   GLOBALS_H
-#include <allegro.h>
+
+#include <SDL.h>
 #include <algorithm>
 #include <cmath>
 #include <string>
@@ -42,6 +43,8 @@
 #define   BEHAVIOR_PURSUE     1    /*   The monster will wander until it aggros, then pursue enemies indefinitely*/
 #define   BEHAVIOR_WANDER     2    /*   The monster will wander, regardless of aggro*/
 
+extern SDL_Renderer * DefaultRenderer; 
+
 //! Structure defining a simple x,y pair
 class Point {
 	public:     
@@ -58,9 +61,9 @@ class Point {
 };
 
 //! Structure implementing a simple reference counter for RLE_SPRITE's
-struct RLE_SPRITE_REF { 
+struct SPRITE_REF { 
      /*! The actual sprite data */
-	RLE_SPRITE * sprite;
+   SDL_Texture * sprite;
      /*! Some unique identifier */
 	int ID;
      /*! Reference Counter */
@@ -90,6 +93,6 @@ bool Distance(Point A, Point B, int Dist);
 /*! Converts a Boolean to the string "true" or "false" */
 std::string BooltoString(bool In);
 
-/*! Creates either a video or memory bitmap based upon the global options */
-BITMAP * create_display_bitmap(int x, int y);
+/*! Creates an SDL_Rect from the given coordinates */
+SDL_Rect * CreateSDLRect(int x, int y, int w, int h);
 #endif

@@ -2,6 +2,14 @@
 *.exe
 *~
 
-output/
+*.psess
+*.sdf
+*.suo
+*.vsp
+*.user
 
+output/
+Debug/
+
+.gitattributes
 

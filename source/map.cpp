@@ -18,7 +18,7 @@
 
 #include "map.h"
 
-#include "loadpng.h"
+#include <SDL_image.h>
 MapController * Map;
 
 MapController::MapController() {
@@ -26,17 +26,20 @@ MapController::MapController() {
      /*   Our BITMAP * are initialized to garbage.  Pre-initalize them
           to pass the LoadMap() tests
      */
-     Map=create_bitmap(1,1);
-     MiniMap=create_bitmap(1,1);
      Options * Opts=new Options;
-     std::string Path=Opts->ModDirectory+"/images/interface/";
+     Map = NULL;
+     MiniMap = NULL;
+     std::string Path="./"+Opts->ModDirectory+"/images/interface/";
      Path+="minimap.png";
-     MiniMapMask=load_png(Path.c_str(), NULL);
+     SDL_Surface * temp = IMG_Load(Path.c_str());
+     SDL_SetColorKey(temp, SDL_TRUE, SDL_MapRGB(temp->format, 255, 0, 255));
+     MiniMapMask=SDL_CreateTextureFromSurface(DefaultRenderer,temp);
      if(!MiniMapMask)
           Error->ReportError(ERROR_SEVERITY_FATAL, "Could not minimap mask");
+     SDL_FreeSurface(temp);
 }
 MapController::~MapController() {
-     destroy_bitmap(Map);
+     SDL_DestroyTexture(Map);
      delete Error;
      Passable.clear();
 }
@@ -46,19 +49,10 @@ void MapController::LoadMap(const char * Filename) {
      std::string Path=Opts->ModDirectory+"/images/maps/";
      Path+=Filename;
      Path+=".png";
-     BITMAP * Data=load_png(Path.c_str(), NULL);
-     if(!Data) {
-          std::string Err="Could not load image: ";
-          Err+=Filename;
-          Error->ReportError(ERROR_SEVERITY_FATAL, Err);
-     }
-     if(Map)
-          destroy_bitmap(Map);
-     Map=create_display_bitmap(Data->w, Data->h);
+     SDL_DestroyTexture(Map);
+     Map = SDL_CreateTextureFromSurface(DefaultRenderer, IMG_Load(Path.c_str()));
      if(!Map)
-               Error->ReportError(ERROR_SEVERITY_FATAL, "Could not create Video Bitmap");
-     blit(Data, Map, 0,0,0,0,Data->w, Data->h);
-     destroy_bitmap(Data);
+               Error->ReportError(ERROR_SEVERITY_FATAL, "Could not load map image");
      Path=Opts->ModDirectory+"/maps/";
      Path+=Filename;
      Path+=".map";
@@ -76,23 +70,25 @@ void MapController::LoadMap(const char * Filename) {
      MakeMinimap();
 }
 void MapController::MakeMinimap() {
-     if(MiniMap)
-          destroy_bitmap(MiniMap);
-     BITMAP * MiniMapHold=create_bitmap(Map->w/8, Map->h/8);
-     MiniMap=create_bitmap(Map->w/8, Map->h/8);
-     /* We need to put the map in a memory bitmap for scaling */
-     BITMAP * MapHold=create_bitmap(Map->w, Map->h);
-     blit(Map, MapHold, 0,0,0,0,Map->w, Map->h);
-     stretch_blit(MapHold, MiniMapHold, 0,0,Map->w, Map->h,0,0,Map->w/8, Map->h/8);
-     blit(MiniMapHold, MiniMap, 0,0,0,0,MiniMap->w, MiniMap->h);
-     destroy_bitmap(MapHold);
-     destroy_bitmap(MiniMapHold);
+    SDL_DestroyTexture(MiniMap);
+    //Internals.  Don't free
+    int *w=new int, *h=new int;
+    SDL_QueryTexture(Map, NULL, NULL, w, h);
+    SDL_Surface * MiniMapHold = SDL_CreateRGBSurface(0, *w / 8, *h / 8, 32, 0, 0, 0, 0);
+    SDL_Renderer * minimapRender = SDL_CreateSoftwareRenderer(MiniMapHold);
+
+
+    SDL_RenderCopy(minimapRender, Map, NULL, CreateSDLRect(0, 0, *w / 8, *h / 8));
+    MiniMap = SDL_CreateTextureFromSurface(DefaultRenderer, MiniMapHold);
+
+    SDL_DestroyRenderer(minimapRender);
+    SDL_FreeSurface(MiniMapHold);
 }
 
-void MapController::Render(BITMAP * Buffer, Point Actual) {
-     blit(Map, Buffer, Actual.x, Actual.y, 0,0,768,640);
-     blit(MiniMap, Buffer, Actual.x/8, Actual.y/8, 800,0,192, 160);
-     masked_blit(MiniMapMask, Buffer, 0,0,800,0, 192, 160);
+void MapController::Render(Point Actual) {
+    SDL_RenderCopy(DefaultRenderer, Map, CreateSDLRect(Actual.x, Actual.y, 768, 640), CreateSDLRect(0, 0, 768, 640));
+    SDL_RenderCopy(DefaultRenderer, Map, CreateSDLRect(Actual.x, Actual.y, 1536,1280), CreateSDLRect(800, 0, 192, 160));
+    SDL_RenderCopy(DefaultRenderer, MiniMapMask, NULL, CreateSDLRect(800, 0, 192, 160));
      //rectfill(Buffer, 898, 82, 902, 86, makecol(255,255,255));
 }
 Point MapController::GetSize() {

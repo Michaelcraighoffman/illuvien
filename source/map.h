@@ -19,7 +19,7 @@
 #ifndef   MAP_H
 #define   MAP_H
 
-#include <allegro.h>
+#include <SDL.h>
 #include <vector>
 #include "globals.h"
 #include "error.h"
@@ -28,9 +28,9 @@
 class MapController {
      protected:
           int Width, Height;
-          BITMAP * Map;
-          BITMAP * MiniMap;
-          BITMAP * MiniMapMask;
+          SDL_Texture * Map;
+          SDL_Texture * MiniMap;
+          SDL_Texture * MiniMapMask;
           ErrorHandler * Error;
           std::vector <std::vector <int> > Passable;
      public:
@@ -38,7 +38,7 @@ class MapController {
           ~MapController();
           void LoadMap(const char * Filename);
           void MakeMinimap();
-          void Render(BITMAP * Buffer, Point Actual);
+          void Render(Point Actual);
           void MapProcessXML(IlluvienXMLTag Tag);
           Point GetSize();
           bool IsPassable(Point Loc, int Status);

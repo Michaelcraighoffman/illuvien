@@ -111,7 +111,7 @@ void MonsterController::Attack(int i) {
      if(Target > -1) {
           if(  abs(Monsters[i].Position.x-Monsters[Target].Position.x) <= Monsters[i].Battle.MeleeRange &&
                abs(Monsters[i].Position.y-Monsters[Target].Position.y) <= Monsters[i].Battle.MeleeRange) {
-                if(Monsters[i].Battle.MeleeCooldown == 0) {
+                if(Monsters[i].Battle.MeleeCooldown <= 0) {
                     AdjustFacing(i, Monsters[Target].Position);
                     Monsters[i].Battle.MeleeCooldown=Monsters[i].Battle.MeleeSpeed;
                     BattleManager BattleObject;
@@ -140,7 +140,7 @@ void MonsterController::Attack(int i) {
           }
           else if(  abs(Monsters[i].Position.x-PlayerPosition.x) <= Monsters[i].Battle.MeleeRange &&
                     abs(Monsters[i].Position.y-PlayerPosition.y) <= Monsters[i].Battle.MeleeRange) {
-                          if(Monsters[i].Battle.MeleeCooldown == 0) {
+                          if(Monsters[i].Battle.MeleeCooldown <= 0) {
                               Monsters[i].Battle.MeleeCooldown=Monsters[i].Battle.MeleeSpeed;
                               MsgBox->AddMessage("Attacked Player");
                           }

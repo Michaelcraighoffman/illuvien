@@ -48,7 +48,7 @@
 
 //! A single animation
 struct Animation {
-     RLE_SPRITE * Frames[10];
+     SDL_Texture * Frames[10];
 };
 //! A single Animator
 /*! Base class holding the information for one animator */
@@ -82,8 +82,8 @@ class AnimatorController {
 		/*! Whether or not some action has occured to require the Animators to be sorted before a render */
           bool RequireSort;
      public:
-          //! Generic constructor
-          AnimatorController();
+         AnimatorController();
+
            //! Generic destructor
           ~AnimatorController();
           //!  Helper Function to compare two animators
@@ -120,10 +120,9 @@ class AnimatorController {
           /*!  Only called when AnimatorController::RequireSort is true.  Resorts Animators into RenderList. */
           void Resort();
           //!  Updates all animators
-          /*!  Called a variable number of times based on framerate.*/
-          void Update();
+          void Update(int delta);
           //!  Renders all animators
-          void Render(BITMAP * Buffer, Point Actual);
+          void Render(Point Actual);
 };
 
 extern AnimatorController * Anim;

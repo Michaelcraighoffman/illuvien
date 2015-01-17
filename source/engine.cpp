@@ -25,6 +25,11 @@ int FrameDelay;
 /* The number of milliseconds since the last frame we drew */
 int LastFrame;
 
+/* The number of milliseconds to wait between updating player movement */
+#define INPUT_TICK_MS 50
+
+int LastMove;
+
 GameEngine::GameEngine(SDL_Window * activeWindow) {
      Map=new MapController;
      Error=new ErrorHandler("Engine", ERROR_SEVERITY_LOG, false);
@@ -47,11 +52,9 @@ GameEngine::~GameEngine() {
      delete MsgBox;
 }
 void GameEngine::Setup() {
-    Renderer=SDL_CreateRenderer(Window, -1, SDL_RENDERER_ACCELERATED|(Opts->UseVsync ? SDL_RENDERER_PRESENTVSYNC : 0));
      Map->LoadMap("synen");
      GameDone=false;
      Player->Setup();
-     PlayerPosition=Player->GetPosition();
     if(Opts->Framerate > 0) {
         FrameDelay=1000/Opts->Framerate;
     }
@@ -75,10 +78,11 @@ void GameEngine::Loop() {
     int delta=0;
     while(!GameDone) {
         delta=SDL_GetTicks()-last;
+        last = SDL_GetTicks();
         Action(delta);
         Anim->Update(delta);
         Render(delta);
-        InputLoop();
+        InputLoop(delta);
         SDL_Delay(1);
      }
 }
@@ -89,18 +93,18 @@ void GameEngine::Render(int delta) {
         else LastFrame-=FrameDelay;
      }
      FPS->Frame();
-     SDL_RenderClear(Renderer);
+     SDL_RenderClear(DefaultRenderer);
      Actual=GetRenderRect();
-     Map->Render(Renderer, Actual);
-     Anim->Render(Renderer, Actual);
-     MonsterManager->Render(Renderer, Actual);
-     MsgBox->Render(Renderer);
+     Map->Render(Actual);
+     Anim->Render(Actual);
+     MonsterManager->Render(Actual);
+     MsgBox->Render();
      //textprintf_ex(Buffer, font, 0,0, makecol(0,0,0), -1, "%i", FPS->GetFPS());
      //textprintf_ex(Buffer, font, 0,10, makecol(0,0,0), -1, "%i,%i", mouse_x, mouse_y);
-     SDL_RenderPresent(renderer);
+     SDL_RenderPresent(DefaultRenderer);
 }
 
-void GameEngine::InputLoop() {
+void GameEngine::InputLoop(int Delta) {
     SDL_Event event;
     if(SDL_PollEvent(&event)) {
         switch(event.type) {
@@ -114,45 +118,51 @@ void GameEngine::InputLoop() {
         }
     }
     const Uint8 *state = SDL_GetKeyboardState(NULL);
-    Point NewPosition=Player->GetPosition();
-     if(state[SDL_SCANCODE_LEFT]) {
-          NewPosition.x--;
-          if(Map->IsPassable(NewPosition, Player->GetMountStatus())) {
-               Player->SetDestination(NewPosition, ANIM_WEST);
-          }
-          else {
-               NewPosition.x++;
-          }
-     }
-     else if(state[SDL_SCANCODE_RIGHT]) {
-          NewPosition.x++;
-          if(Map->IsPassable(NewPosition, Player->GetMountStatus())) {
-               Player->SetDestination(NewPosition, ANIM_EAST);
-          }
-          else {
-               NewPosition.x--;
-          }
 
-     }
-     else if(state[SDL_SCANCODE_UP]) {
-          NewPosition.y--;
-          if(Map->IsPassable(NewPosition, Player->GetMountStatus())) {
-               Player->SetDestination(NewPosition, ANIM_NORTH);
-          }
-          else {
-               NewPosition.y++;
-          }
-     }
-     else if(state[SDL_SCANCODE_DOWN]) {
-          NewPosition.y++;
-          if(Map->IsPassable(NewPosition, Player->GetMountStatus())) {
-               Player->SetDestination(NewPosition, ANIM_SOUTH);
-          }
-          else {
-               NewPosition.y--;
-          }
+    LastMove += Delta;
+    if (LastMove > INPUT_TICK_MS){
+        LastMove = 0;
+        
+        Point NewPosition = Player->GetPosition();
+        if (state[SDL_SCANCODE_LEFT]) {
+            NewPosition.x--;
+            if (Map->IsPassable(NewPosition, Player->GetMountStatus())) {
+                Player->SetDestination(NewPosition, ANIM_WEST);
+            }
+            else {
+                NewPosition.x++;
+            }
+        }
+        else if (state[SDL_SCANCODE_RIGHT]) {
+            NewPosition.x++;
+            if (Map->IsPassable(NewPosition, Player->GetMountStatus())) {
+                Player->SetDestination(NewPosition, ANIM_EAST);
+            }
+            else {
+                NewPosition.x--;
+            }
 
-     }
+        }
+        else if (state[SDL_SCANCODE_UP]) {
+            NewPosition.y--;
+            if (Map->IsPassable(NewPosition, Player->GetMountStatus())) {
+                Player->SetDestination(NewPosition, ANIM_NORTH);
+            }
+            else {
+                NewPosition.y++;
+            }
+        }
+        else if (state[SDL_SCANCODE_DOWN]) {
+            NewPosition.y++;
+            if (Map->IsPassable(NewPosition, Player->GetMountStatus())) {
+                Player->SetDestination(NewPosition, ANIM_SOUTH);
+            }
+            else {
+                NewPosition.y--;
+            }
+
+        }
+    }
     if(state[SDL_SCANCODE_ESCAPE]) {
          GameDone=true;
     }

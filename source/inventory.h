@@ -19,7 +19,7 @@
 #ifndef   INVENTORY_H
 #define   INVENTORY_H
 
-#include <allegro.h>
+#include <SDL.h>
 #include <string>
 #include <vector>
 
@@ -34,22 +34,22 @@ struct Item {
                             in one stack */
      int CurrentStack;   /* The number of items in this stack */
      char Type;          /* What type of item this is */
-     RLE_SPRITE_REF * Icon;           /* ID of the icon for the item */
+     SPRITE_REF * Icon;           /* ID of the icon for the item */
 };
 
 class ItemHandler {
     protected:
           std::vector <Item> LoadedItems;
-          std::vector <RLE_SPRITE_REF *> IconCache;
+          std::vector <SPRITE_REF *> IconCache;
     public:
           ItemHandler();
           ~ItemHandler();
           bool LoadItem(int ID);
-		RLE_SPRITE_REF * LoadIcon(int ID);
+		SPRITE_REF * LoadIcon(int ID);
           Item RetrieveItem(int ID);
           int ItemSearch(int ID); 
           void ProcessTag(IlluvienXMLTag Tag);
-		void Render(BITMAP * Buffer);
+		  void Render();
 };
     
 
@@ -61,7 +61,7 @@ class Inventory {
           bool AddItem(Item In);
           bool TakeItem(Item In);
           int CountItem(Item In);
-		void Render(BITMAP * Buffer);
+		void Render();
 };
 extern ItemHandler * GlobalItemHandler;
 extern ErrorHandler * Error;

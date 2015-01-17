@@ -18,6 +18,10 @@
 
 #include "player.h"
 
+#include <SDL_image.h>
+
+#define ENGINE_TICK_MS 200
+
 PlayerController * Player;
 
 /* Milliseconds since the last time we updated the Player */
@@ -33,38 +37,48 @@ PlayerController::~PlayerController() {
 
 void PlayerController::Setup() {
      Options * Opts=new Options;
-     BITMAP * Image;
+     SDL_Surface * Image;
      Position.x=21;
      Position.y=11;
      Destination=Position;
      std::string Path=Opts->ModDirectory+"/images/player/priest/priest.bmp";
-     BITMAP * Data=load_bitmap(Path.c_str(), NULL);
+     SDL_Surface * Data = IMG_Load(Path.c_str());
      if(!Data) {
           Error->ReportError(ERROR_SEVERITY_FATAL, "Could not load image: Priest");
      }
      Animation AnimHold[7];
+     SDL_Rect src;
+     src.w = Data->w / 4;
+     src.h = Data->h / 7;
+     Image = SDL_CreateRGBSurface(0, Data->w / 4, Data->h / 7, 32, 0, 0, 0, 0);
+     SDL_SetColorKey(Image, SDL_TRUE, SDL_MapRGB(Image->format, 255, 0, 255));
      for(int i=0; i<7; i++) {
-          Image=create_display_bitmap(Data->w/4, Data->h/7);
-          if(!Image)
-               Error->ReportError(ERROR_SEVERITY_FATAL, "Could not create Bitmap");
-          blit(Data, Image, 0,i*(Data->h/7),0,0,Data->w/4, Data->h/7);
-          AnimHold[i].Frames[0]=get_rle_sprite(Image);
-          blit(Data, Image, 32,i*(Data->h/7),0,0,Data->w/4, Data->h/7);
-          AnimHold[i].Frames[1]=get_rle_sprite(Image);
-          AnimHold[i].Frames[2]=get_rle_sprite(Image);
-          AnimHold[i].Frames[3]=get_rle_sprite(Image);
-          blit(Data, Image, 64,i*(Data->h/7),0,0,Data->w/4, Data->h/7);
-          AnimHold[i].Frames[4]=get_rle_sprite(Image);
-          AnimHold[i].Frames[5]=get_rle_sprite(Image);
-          AnimHold[i].Frames[6]=get_rle_sprite(Image);
-          blit(Data, Image, 96,i*(Data->h/7),0,0,Data->w/4, Data->h/7);
-          AnimHold[i].Frames[7]=get_rle_sprite(Image);
-          AnimHold[i].Frames[8]=get_rle_sprite(Image);
-          AnimHold[i].Frames[9]=get_rle_sprite(Image);
-          destroy_bitmap(Image);
+         
+         if (!Image)
+             Error->ReportError(ERROR_SEVERITY_FATAL, "Could not create Bitmap");
+         src.x = 0;
+         src.y = i*(Data->h / 7);
+         SDL_BlitSurface(Data, &src, Image, NULL);
+         AnimHold[i].Frames[0] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
+         src.x = 32;
+         SDL_BlitSurface(Data, &src, Image, NULL);
+         AnimHold[i].Frames[1] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
+         AnimHold[i].Frames[2] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
+         AnimHold[i].Frames[3] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
+         src.x = 64;
+         SDL_BlitSurface(Data, &src, Image, NULL);
+         AnimHold[i].Frames[4] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
+         AnimHold[i].Frames[5] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
+         AnimHold[i].Frames[6] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
+         src.x = 96;
+         SDL_BlitSurface(Data, &src, Image, NULL);
+         AnimHold[i].Frames[7] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
+         AnimHold[i].Frames[8] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
+         AnimHold[i].Frames[9] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
      }
+     SDL_FreeSurface(Image);
      AnimationIndex=Anim->AddAnimator(ANIM_FULL, AnimHold, Position);
-     destroy_bitmap(Data);
+     SDL_FreeSurface(Data);
      delete Opts;
 }
 

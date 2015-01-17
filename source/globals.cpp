@@ -1,23 +1,12 @@
 #include "globals.h"
 
+SDL_Renderer * DefaultRenderer;
 void PopupBox(std::string msg) {
      PopupBox(msg.c_str());
 }
 
 void PopupBox(const char * msg) {
-     Options opts;
-     /* Check if we are in a Windowed mode.  If we are, use a popup message */
-     if(opts.CurrentMode==GFX_AUTODETECT_WINDOWED
-          #ifdef GFX_DIRECTX_WIN
-          || opts.CurrentMode==GFX_DIRECTX_WIN
-          #endif
-       ) {
-            allegro_message("%s",msg);
-       }
-     /* If we aren't, fake a popup message */
-     else {
           /* Fake later */
-     }
 }
 
 int StringToInt(std::string in) {
@@ -69,17 +58,11 @@ std::string BooltoString(bool In) {
      return "false";
 }
 
-BITMAP * create_display_bitmap(int x, int y) {
-     Options * Opts=new Options;
-     BITMAP * Out;
-     if(Opts->UseVRAM) {
-          Out=create_video_bitmap(x,y);
-          if(Out)
-               return Out;
-     }
-     Out=create_bitmap(x,y);
-     if(Out)
-          return Out;
-     return NULL;
+SDL_Rect * CreateSDLRect(int x, int y, int w, int h){
+    SDL_Rect * rect = new SDL_Rect();
+    rect->x = x;
+    rect->y = y;
+    rect->w = w;
+    rect->h = h;
+    return rect;
 }
-

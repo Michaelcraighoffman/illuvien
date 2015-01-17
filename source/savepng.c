@@ -6,7 +6,7 @@
 
 
 #include <png.h>
-#include <allegro.h>
+#include <SDL.h>
 #include "loadpng.h"
 
 

@@ -19,7 +19,8 @@
 #ifndef   MESSAGEBOX_H
 #define   MESSAGEBOX_H
 
-#include <allegro.h>
+#include <SDL.h>
+#include <SDL_ttf.h>
 #include <string>
 #include <vector>
 #include "globals.h"
@@ -38,7 +39,7 @@ struct TextPiece {
      /*! The Actual text */
      std::string Text;
      /*! The color to print this portion of the message in */
-     int Color;
+     SDL_Color Color;
 };
 //! A messagebox message
 struct Message {
@@ -51,9 +52,14 @@ class IlluvienMessageBox {
           /*! Vector of all the reported messages */
           std::vector <Message> Messages;
           /*! Background image for the messagebox */
-          BITMAP * MessageBoxImage;    
+          SDL_Texture * MessageBoxImage;   
+
+          /*! Font to use for the Message Box*/
+          TTF_Font * Font;
+          /*! Pre-Rendering of the messagebox */
+          SDL_Surface * SurfacePrerender;
           /*! Pre-Rendering of the messagebox */ 
-          BITMAP * Prerender;          
+          SDL_Texture * Prerender;
      public:
           IlluvienMessageBox();
           ~IlluvienMessageBox();
@@ -64,9 +70,9 @@ class IlluvienMessageBox {
           /*! Pre-Renders the Messagebox */
           void ReRender();
           /*! Renders the messagebox to the Buffer */
-          void Render(BITMAP * Buffer);
+          void Render();
           /*! Renders a single string to the buffer */
-          void RenderString(BITMAP * Buffer, int Which);
+          void RenderString(SDL_Surface * Buffer, int Which);
 };
 extern IlluvienMessageBox * MsgBox;
 #endif
