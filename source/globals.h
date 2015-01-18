@@ -94,5 +94,5 @@ bool Distance(Point A, Point B, int Dist);
 std::string BooltoString(bool In);
 
 /*! Creates an SDL_Rect from the given coordinates */
-SDL_Rect * CreateSDLRect(int x, int y, int w, int h);
+SDL_Rect CreateSDLRect(int x, int y, int w, int h);
 #endif

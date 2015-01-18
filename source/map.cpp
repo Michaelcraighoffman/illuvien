@@ -78,7 +78,7 @@ void MapController::MakeMinimap() {
     SDL_Renderer * minimapRender = SDL_CreateSoftwareRenderer(MiniMapHold);
 
 
-    SDL_RenderCopy(minimapRender, Map, NULL, CreateSDLRect(0, 0, *w / 8, *h / 8));
+    SDL_RenderCopy(minimapRender, Map, NULL, &CreateSDLRect(0, 0, *w / 8, *h / 8));
     MiniMap = SDL_CreateTextureFromSurface(DefaultRenderer, MiniMapHold);
 
     SDL_DestroyRenderer(minimapRender);
@@ -86,9 +86,9 @@ void MapController::MakeMinimap() {
 }
 
 void MapController::Render(Point Actual) {
-    SDL_RenderCopy(DefaultRenderer, Map, CreateSDLRect(Actual.x, Actual.y, 768, 640), CreateSDLRect(0, 0, 768, 640));
-    SDL_RenderCopy(DefaultRenderer, Map, CreateSDLRect(Actual.x, Actual.y, 1536,1280), CreateSDLRect(800, 0, 192, 160));
-    SDL_RenderCopy(DefaultRenderer, MiniMapMask, NULL, CreateSDLRect(800, 0, 192, 160));
+    SDL_RenderCopy(DefaultRenderer, Map, &CreateSDLRect(Actual.x, Actual.y, 768, 640), &CreateSDLRect(0, 0, 768, 640));
+    SDL_RenderCopy(DefaultRenderer, Map, &CreateSDLRect(Actual.x, Actual.y, 1536,1280), &CreateSDLRect(800, 0, 192, 160));
+    SDL_RenderCopy(DefaultRenderer, MiniMapMask, NULL, &CreateSDLRect(800, 0, 192, 160));
      //rectfill(Buffer, 898, 82, 902, 86, makecol(255,255,255));
 }
 Point MapController::GetSize() {
