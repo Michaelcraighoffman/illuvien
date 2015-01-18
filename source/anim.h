@@ -19,8 +19,10 @@
 #ifndef   ANIM_H
 #define   ANIM_H
 
-#include <vector>
+
 #include <algorithm>
+#include <array>
+#include <vector>
 #include "globals.h"
 
 //!  Anim.h
@@ -30,9 +32,9 @@
 
 //! Animator Type
 /*! Determines what features an animator has */
-#define   ANIM_SIMPLE    0    /*!   Animator which does not disappear and has only one animation (flags, arrows, etc) */
-#define   ANIM_ONCE      1    /*!   Static animator which goes through it animations a preset number of times
-                                   and is deleted (spell effects) */
+#define   ANIM_ONCE      0    /*!   Static animator which goes through it animations a preset number of times
+and is deleted (spell effects) */
+#define   ANIM_SIMPLE    1    /*!   Animator which does not disappear and has only one animation (flags, arrows, etc) */
 #define   ANIM_FULL      2    /*!   A Full Animatior, which can move and change animations (players, monsters) */
 
 //! Animator Actions
@@ -45,6 +47,7 @@
 #define   ANIM_NORTH     4
 #define   ANIM_ATTACKA   5
 #define   ANIM_ATTACKB   6
+#define   NUM_ANIMATIONS 7
 
 //! A single animation
 struct Animation {
@@ -54,7 +57,7 @@ struct Animation {
 /*! Base class holding the information for one animator */
 struct Animator {
      /*! All the animations */
-     Animation Animations[7];
+    std::array<Animation, NUM_ANIMATIONS> Animations;
      int Type;
      /*! The action the animator is currently performing */
      int Action;
@@ -74,6 +77,8 @@ struct Animator {
      int LastMovement;
      /*! Whether or not the Animator is currently idle */
      bool Idle;
+
+     bool operator<(const Animator &B);
 };
 //! The Animator Controller
 /*! Controls all the animators */
@@ -81,25 +86,20 @@ class AnimatorController {
      protected:
 		/*! All the animators */
           std::vector <Animator> Animators;
-		/*! A list of the indicies of Animators, sorted by the order they should be rendered in */
-          std::vector <unsigned int> RenderList;
-		/*! Whether or not some action has occured to require the Animators to be sorted before a render */
+
+		/*! Whether or not some action has occured to require the Animators to be resorted before a render */
           bool RequireSort;
      public:
          AnimatorController();
 
            //! Generic destructor
           ~AnimatorController();
-          //!  Helper Function to compare two animators
-          /*!  Compares two animators by comparing their y and x values, and prioritizes anim_simple's (which are generally spell effects)
-               above regular animators */
-          bool CompareAnimators(int A, int B);
           //!  Adds an animator
           /*!  Uses the given values to prepare an Animator struct, then adds it to the Animators vector. */
-          int AddAnimator(int Type, int Duration, Animation Animations[7], Point Location);
+          int AddAnimator(int Type, int Duration, std::array<Animation, NUM_ANIMATIONS> Animations, Point Location);
           //!  Adds an animator which is shown once
           /*!  Uses the given values to prepare an Animator struct, then adds it to the Animators vector. */
-          int AddAnimatorOnce(Animation Animations[7], int Frames, Point Location);
+          int AddAnimatorOnce(std::array<Animation, NUM_ANIMATIONS> Animations, int Frames, Point Location);
           //!  Adds an animator to show damage
           /*!  Creates a bitmap to show the amount of damage done, then calls AddAnimatorOnce to add the animator */
           void AddDamageAnimator(int Amount, Point Location);
@@ -120,9 +120,6 @@ class AnimatorController {
           void MoveTowardsDestination(int ID) ;
           //!  Helper Function to translate a GUID to it's corresponding ID
           int GUIDtoID(int GUID);
-          //!  Resorts the Animators
-          /*!  Only called when AnimatorController::RequireSort is true.  Resorts Animators into RenderList. */
-          void Resort();
           //!  Updates all animators
           void Update(int delta);
           //!  Renders all animators

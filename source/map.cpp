@@ -27,8 +27,8 @@ MapController::MapController() {
           to pass the LoadMap() tests
      */
      Options * Opts=new Options;
-     Map = NULL;
-     MiniMap = NULL;
+     Map = nullptr;
+     MiniMap = nullptr;
      std::string Path="./"+Opts->ModDirectory+"/images/interface/";
      Path+="minimap.png";
      SDL_Surface * temp = IMG_Load(Path.c_str());
@@ -73,11 +73,11 @@ void MapController::MakeMinimap() {
     SDL_DestroyTexture(MiniMap);
     //Internals.  Don't free
     int *w=new int, *h=new int;
-    SDL_QueryTexture(Map, NULL, NULL, w, h);
+    SDL_QueryTexture(Map, nullptr, nullptr, w, h);
     SDL_Surface * MiniMapHold = SDL_CreateRGBSurface(0, *w / 8, *h / 8, 32, 0, 0, 0, 0);
     SDL_Renderer * minimapRender = SDL_CreateSoftwareRenderer(MiniMapHold);
 
-    SDL_RenderCopy(minimapRender, Map, NULL, CreateSDLRect(0, 0, *w / 8, *h / 8).get());
+    SDL_RenderCopy(minimapRender, Map, nullptr, CreateSDLRect(0, 0, *w / 8, *h / 8).get());
     MiniMap = SDL_CreateTextureFromSurface(DefaultRenderer, MiniMapHold);
 
     SDL_DestroyRenderer(minimapRender);
@@ -87,7 +87,7 @@ void MapController::MakeMinimap() {
 void MapController::Render(Point Actual) {
     SDL_RenderCopy(DefaultRenderer, Map, CreateSDLRect(Actual.x, Actual.y, 768, 640).get(), CreateSDLRect(0, 0, 768, 640).get());
     SDL_RenderCopy(DefaultRenderer, Map, CreateSDLRect(Actual.x, Actual.y, 1536,1280).get(), CreateSDLRect(800, 0, 192, 160).get());
-    SDL_RenderCopy(DefaultRenderer, MiniMapMask, NULL, CreateSDLRect(800, 0, 192, 160).get());
+    SDL_RenderCopy(DefaultRenderer, MiniMapMask, nullptr, CreateSDLRect(800, 0, 192, 160).get());
      //rectfill(Buffer, 898, 82, 902, 86, makecol(255,255,255));
 }
 Point MapController::GetSize() {

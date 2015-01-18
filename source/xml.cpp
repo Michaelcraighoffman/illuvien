@@ -20,7 +20,7 @@
 #include "xml.h"
 
 IlluvienXMLTag::IlluvienXMLTag() {
-     Parent=NULL;
+    Parent = nullptr;
 }
 IlluvienXMLTag::~IlluvienXMLTag() {
      while(Children.size()>0) {
@@ -89,7 +89,7 @@ int IlluvienXMLParser::Parse() {
                     }
                     else {
                          CurrentTag=CurrentTag->Parent;
-                         if(CurrentTag==NULL) {
+                         if (CurrentTag == nullptr) {
                               return XML_GOODTREE;
                          }
                     }

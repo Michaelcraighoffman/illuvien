@@ -85,7 +85,7 @@ void GameEngine::Loop() {
         Anim->Update(delta);
         Render(delta);
         InputLoop(delta);
-        if (delta = 0) { Error->ReportError(ERROR_SEVERITY_LOG, "Got 0 delta"); }
+        if (delta == 0) { Error->ReportError(ERROR_SEVERITY_LOG, "Got 0 delta"); }
      }
 }
 void GameEngine::Render(int delta) {
@@ -103,7 +103,7 @@ void GameEngine::Render(int delta) {
      MsgBox->Render();
      SDL_Surface * fpsSurface = TTF_RenderText_Solid(FontManager::GetOverlayFont(), IntToString(FPS->GetFPS()).c_str(), { 255, 255, 255 });
      SDL_Texture * fpsTexture = SDL_CreateTextureFromSurface(DefaultRenderer, fpsSurface);
-     SDL_RenderCopy(DefaultRenderer, fpsTexture, NULL, CreateSDLRect(0, 0, fpsSurface->w, fpsSurface->h).get());
+     SDL_RenderCopy(DefaultRenderer, fpsTexture, nullptr, CreateSDLRect(0, 0, fpsSurface->w, fpsSurface->h).get());
      //textprintf_ex(Buffer, font, 0,0, makecol(0,0,0), -1, "%i", FPS->GetFPS());
      //textprintf_ex(Buffer, font, 0,10, makecol(0,0,0), -1, "%i,%i", mouse_x, mouse_y);
      SDL_RenderPresent(DefaultRenderer);
@@ -124,7 +124,7 @@ void GameEngine::InputLoop(int Delta) {
                 break;
         }
     }
-    const Uint8 *state = SDL_GetKeyboardState(NULL);
+    const Uint8 *state = SDL_GetKeyboardState(nullptr);
 
     Point NewPosition = Player->GetPosition();
     if (state[SDL_SCANCODE_LEFT]) {

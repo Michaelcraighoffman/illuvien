@@ -28,33 +28,28 @@
 #include <SDL_ttf.h>
 #include <iostream>
 #include <fstream>
+#include <iterator>
 using namespace std;
 AnimatorController * Anim;
 
-
-bool AnimatorController::CompareAnimators(int A, int B) {
-    bool AisSimple = false, BisSimple = false;
-    if (Animators[A].Type == ANIM_ONCE || Animators[A].Type == ANIM_SIMPLE)
-        AisSimple = true;
-    if (Animators[B].Type == ANIM_ONCE || Animators[B].Type == ANIM_SIMPLE)
-        BisSimple = true;
-    if (AisSimple == true && BisSimple == false)
+bool Animator::operator<(const Animator &B) {
+    /* Once Animators > Simple Animators > full Animators */
+    if (this->Type < B.Type)
         return false;
-    if (AisSimple == false && BisSimple == true)
+    if (this->Type > B.Type)
         return true;
 
-    if (Animators[A].Position.y < Animators[B].Position.y)
-        return true;
-    if (Animators[A].Position.y > Animators[B].Position.y)
-        return false;
+
+    if (this->Position.y != B.Position.y)
+        return this->Position.y < B.Position.y;
     /* The y-values are equal */
-    if (Animators[A].Position.x < Animators[B].Position.x)
-        return true;
+    if (this->Position.x != B.Position.x)
+        return this->Position.x < B.Position.x;
+    
+    /* The Animators are on the same tile */
+   
+    
     return false;
-}
-
-static bool Compare(int A, int B) {
-    return Anim->CompareAnimators(A, B);
 }
 
 AnimatorController::AnimatorController()
@@ -67,33 +62,27 @@ AnimatorController::~AnimatorController() {
     RequireSort = true;
 }
 
-int AnimatorController::AddAnimator(int Type, int Duration, Animation Animations[7], Point Location) {
+int AnimatorController::AddAnimator(int Type, int Duration, std::array<Animation, NUM_ANIMATIONS> Animations, Point Location) {
     Animator New;
     New.Type = Type;
     New.Action = ANIM_IDLE;
-    for (int i = 0; i < 7; i++) {
-        New.Animations[i] = Animations[i];
-    }
-    New.Position.x = Location.x * 32;
-    New.Position.y = Location.y * 32;
-    New.Destination.x = Location.x * 32;
-    New.Destination.y = Location.y * 32;
+    std::copy(std::begin(Animations), std::end(Animations), std::begin(New.Animations));
+    New.Position = Location * 32;
+    New.Destination = Location * 32;
     New.GUID = RandomNumber(0, 1000000);
     New.CurrentFrame = 0;
     New.FrameTime = 0;
     New.LastMovement = 0;
     New.Duration = Duration;
     Animators.push_back(New);
-    RenderList.push_back(Animators.size() - 1);
+    RequireSort = true;
     return New.GUID;
 }
-int AnimatorController::AddAnimatorOnce(Animation Animations[7], int Time, Point Location) {
+int AnimatorController::AddAnimatorOnce(std::array<Animation, NUM_ANIMATIONS> Animations, int Time, Point Location) {
     Animator New;
     New.Type = ANIM_ONCE;
     New.Action = ANIM_IDLE;
-    for (int i = 0; i < 7; i++) {
-        New.Animations[i] = Animations[i];
-    }
+    std::copy(std::begin(Animations), std::end(Animations), std::begin(New.Animations));
     New.Position.x = Location.x * 32;
     New.Position.y = Location.y * 32;
     New.Destination.x = Location.x * 32;
@@ -104,7 +93,7 @@ int AnimatorController::AddAnimatorOnce(Animation Animations[7], int Time, Point
     New.FrameTime = 0;
     New.LastMovement = 0;
     Animators.push_back(New);
-    RenderList.push_back(Animators.size() - 1);
+    RequireSort = true;
     return New.GUID;
 }
 
@@ -114,9 +103,9 @@ void AnimatorController::AddDamageAnimator(int Amount, Point Location) {
         Hold=TTF_RenderText_Solid(FontManager::GetOverlayFont(), IntToString(Amount).c_str(), { 255, 0, 0 });
     else
         Hold=TTF_RenderText_Solid(FontManager::GetOverlayFont(), IntToString(Amount).c_str(), { 0, 255, 0 });
-    Animation Idle[7];
+    std::array<Animation, NUM_ANIMATIONS> Idle;
     SDL_Texture * final = SDL_CreateTextureFromSurface(DefaultRenderer, Hold);
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < NUM_ANIMATIONS; i++) {
         for (int j = 0; j < 10; j++) {
             Idle[i].Frames[j] = final;
         }
@@ -142,47 +131,31 @@ void AnimatorController::RemoveAnimatorGUID(int GUID) {
     }
 }
 void AnimatorController::RemoveAnimatorID(int ID) {
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < NUM_ANIMATIONS; i++) {
         for (int j = 0; j < 10; j++) {
             SDL_DestroyTexture(Animators[ID].Animations[i].Frames[j]);
         }
     }
     Animators.erase(Animators.begin() + ID);
-    Resort();
 }
 void AnimatorController::UpdateAnimator(unsigned int GUID, int Action, bool makeIdle) {
     int ID = GUIDtoID(GUID);
     if (ID != -1) {
-        Animators[ID].Action = Action;
-        Animators[ID].Idle = false;
-        Animators[ID].CurrentFrame = 0;
-        Animators[ID].FrameTime = 0;
-        Animators[ID].LastMovement = 0;
-        if (makeIdle == true) {
-            Animators[ID].Idle = true;
-        }
+        UpdateAnimator(GUID, Action, Animators[ID].Destination/32, makeIdle);
     }
 }
-void AnimatorController::UpdateAnimator(unsigned int GUID, Point Position, bool makeIdle) {
+void AnimatorController::UpdateAnimator(unsigned int GUID, Point Destination, bool makeIdle) {
     int ID = GUIDtoID(GUID);
     if (ID != -1) {
-        Animators[ID].Destination.x = Position.x * 32;
-        Animators[ID].Destination.y = Position.y * 32;
-        Animators[ID].Idle = false;
-        Animators[ID].CurrentFrame = 0;
-        Animators[ID].FrameTime = 0;
-        Animators[ID].LastMovement = 0;
-        if (makeIdle == true) {
-            Animators[ID].Idle = true;
-        }
+        UpdateAnimator(GUID, Animators[ID].Action, Destination, makeIdle);
     }
 }
-void AnimatorController::UpdateAnimator(unsigned int GUID, int Action, Point Position, bool makeIdle) {
+void AnimatorController::UpdateAnimator(unsigned int GUID, int Action, Point Destination, bool makeIdle) {
     int ID = GUIDtoID(GUID);
     if (ID != -1) {
         Animators[ID].Action = Action;
-        Animators[ID].Destination.x = Position.x * 32;
-        Animators[ID].Destination.y = Position.y * 32;
+        Animators[ID].Destination.x = Destination.x * 32;
+        Animators[ID].Destination.y = Destination.y * 32;
         Animators[ID].Idle = false;
         Animators[ID].CurrentFrame = 0;
         Animators[ID].FrameTime = 0;
@@ -229,16 +202,9 @@ int AnimatorController::GUIDtoID(int GUID) {
     }
     return -1;
 }
-void AnimatorController::Resort() {
-    for (unsigned int i = 0; i < RenderList.size(); i++) {
-        if (RenderList[i] >= Animators.size())
-            RenderList.erase(RenderList.begin() + i);
-    }
-    RequireSort = true;
-}
 void AnimatorController::Update(int delta) {
     if (RequireSort == true) {
-        sort(RenderList.begin(), RenderList.end(), Compare);
+        sort(Animators.begin(), Animators.end());
         RequireSort = false;
     }
     Animator current;
@@ -261,28 +227,26 @@ void AnimatorController::Update(int delta) {
     }
 }
 void AnimatorController::Render(Point Actual) {
-    int Offsetx, Offsety, i, Width, Height;
-    unsigned int size = RenderList.size();
+    int Offsetx, Offsety, Width, Height;
     Point Position;
     SDL_Rect dest;
-    for (unsigned int j = 0; j < size; j++) {
-        i = RenderList[j];
-        Position = Animators[i].Position;
+    for (const Animator &current : Animators) {
+        Position = current.Position;
         if (Position.x >= (Actual.x)
             && Position.x < (Actual.x + 768)
             && Position.y >= (Actual.y)
             && Position.y < (Actual.y + 640)){
-            SDL_QueryTexture(Animators[i].Animations[0].Frames[0], NULL, NULL, &Width, &Height);
+            SDL_QueryTexture(current.Animations[0].Frames[0], nullptr, nullptr, &Width, &Height);
             Offsetx = Width - 32;
             Offsety = Height - 32;
             dest.x = ((Position.x - (Actual.x)) - Offsetx);
             dest.y = ((Position.y - (Actual.y)) - Offsety);
             dest.w = Width;
             dest.h = Height;
-            if (Animators[i].Idle == true)
-                SDL_RenderCopy(DefaultRenderer, Animators[i].Animations[Animators[i].Action].Frames[0], NULL, &dest);
+            if (current.Idle == true)
+                SDL_RenderCopy(DefaultRenderer, current.Animations[current.Action].Frames[0], nullptr, &dest);
             else
-                SDL_RenderCopy(DefaultRenderer, Animators[i].Animations[Animators[i].Action].Frames[Animators[i].CurrentFrame], NULL, &dest);
+                SDL_RenderCopy(DefaultRenderer, current.Animations[current.Action].Frames[current.CurrentFrame], nullptr, &dest);
         }
     }
 }

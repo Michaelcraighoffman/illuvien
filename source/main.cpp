@@ -40,7 +40,7 @@ bool SetupGraphics(Options opt, SDL_Window * &win) {
                 1024,                      
                 768,                       
                 SDL_WINDOW_FULLSCREEN);    
-        if(win != NULL) return true;
+        if (win != nullptr) return true;
         Error.ReportError(ERROR_SEVERITY_LOG, "Could not create Fullscreen DirectX Window");
     }
 		
@@ -51,7 +51,7 @@ bool SetupGraphics(Options opt, SDL_Window * &win) {
                1024,                      
                768,                       
                0);    
-    if(win != NULL) return true;
+    if (win != nullptr) return true;
     Error.ReportError(ERROR_SEVERITY_LOG, "Could not create Generic Window");
     //We can't initialize the window
     return false;
@@ -62,7 +62,7 @@ int main(int Argc, char * Argv[]) {
     IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
     TTF_Init();
     Options opts(true);
-    SDL_Window * Window=NULL;
+    SDL_Window * Window = nullptr;
     for(int a=0; a<Argc; a++) {
          if(strcmp(Argv[a], "-nofullscreen")==0)
               opts.UseFullscreen=false;

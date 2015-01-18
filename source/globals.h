@@ -59,6 +59,8 @@ class Point {
 		bool operator>=(const Point& Right) { return (y > Right.y || (y == Right.y && x >=Right.x)); }
 		bool operator<(const Point& Right)  { return (y < Right.y || (y == Right.y && x < Right.x)); }
 		bool operator<=(const Point& Right) { return (y < Right.y || (y == Right.y && x <=Right.x)); }
+        Point operator/(const int val) { Point n; n.x = x / val; n.y = y / val; return n; }
+        Point operator*(const int val) { Point n; n.x = x * val; n.y = y * val; return n; }
 };
 
 //! Structure implementing a simple reference counter for RLE_SPRITE's

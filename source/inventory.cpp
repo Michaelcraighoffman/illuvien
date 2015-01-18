@@ -150,6 +150,6 @@ SPRITE_REF * ItemHandler::LoadIcon(int ID) {
 	delete Opts;
 	return Ref;
 #endif
-    return NULL;
+    return nullptr;
 }
 

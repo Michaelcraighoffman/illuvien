@@ -20,7 +20,7 @@
 
 FPSTimer::FPSTimer()
 {
-     Start=time(NULL);
+    Start = time(nullptr);
      FPSThisFrame=0;
 }
 int FPSTimer::GetFPS()
@@ -29,13 +29,13 @@ int FPSTimer::GetFPS()
 }
 void FPSTimer::Frame()
 {
-     Last=time(NULL);
+    Last = time(nullptr);
      FPSThisFrame++;
      if(Last-Start >= 1)
      {
           FPS=FPSThisFrame;
           FPSThisFrame=0;
-          Start=time(NULL);
+          Start = time(nullptr);
      }
 }
 

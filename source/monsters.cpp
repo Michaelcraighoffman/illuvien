@@ -26,7 +26,7 @@ MonsterController * MonsterManager;
 */
 MonsterController::MonsterController() {
      Error=new ErrorHandler("Monsters", ERROR_SEVERITY_LOG, false);
-     Tooltip = NULL;
+     Tooltip = nullptr;
      DisplayTooltip=false;
      ProcessXML();
 }
@@ -116,33 +116,33 @@ void MonsterController::LoadImages(Monster &Out) {
           Error->ReportError(ERROR_SEVERITY_FATAL, "Could not load image: "+Out.Graphic);
      }
      Out.Size.x=Data->w/4;
-     Out.Size.y=Data->h/7;
-     Animation AnimHold[7];
+     Out.Size.y = Data->h / NUM_ANIMATIONS;
+     std::array<Animation, NUM_ANIMATIONS> AnimHold;
      SDL_Rect src;
      src.w = Data->w / 4;
-     src.h = Data->h / 7;
-     Image = SDL_CreateRGBSurface(0, Data->w / 4, Data->h / 7, 32, 0, 0, 0, 0);
+     src.h = Data->h / NUM_ANIMATIONS;
+     Image = SDL_CreateRGBSurface(0, Data->w / 4, Data->h / NUM_ANIMATIONS, 32, 0, 0, 0, 0);
      SDL_SetColorKey(Image, SDL_TRUE, SDL_MapRGB(Image->format, 255, 0, 255));
-     for (int i = 0; i<7; i++) {
+     for (int i = 0; i<NUM_ANIMATIONS; i++) {
 
          if (!Image)
              Error->ReportError(ERROR_SEVERITY_FATAL, "Could not create Bitmap");
          src.x = 0;
-         src.y = i*(Data->h / 7);
-         SDL_BlitSurface(Data, &src, Image, NULL);
+         src.y = i*(Data->h / NUM_ANIMATIONS);
+         SDL_BlitSurface(Data, &src, Image, nullptr);
          AnimHold[i].Frames[0] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
          src.x += (Data->w / 4);
-         SDL_BlitSurface(Data, &src, Image, NULL);
+         SDL_BlitSurface(Data, &src, Image, nullptr);
          AnimHold[i].Frames[1] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
          AnimHold[i].Frames[2] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
          AnimHold[i].Frames[3] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
          src.x += (Data->w / 4);
-         SDL_BlitSurface(Data, &src, Image, NULL);
+         SDL_BlitSurface(Data, &src, Image, nullptr);
          AnimHold[i].Frames[4] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
          AnimHold[i].Frames[5] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
          AnimHold[i].Frames[6] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
          src.x += (Data->w / 4);
-         SDL_BlitSurface(Data, &src, Image, NULL);
+         SDL_BlitSurface(Data, &src, Image, nullptr);
          AnimHold[i].Frames[7] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
          AnimHold[i].Frames[8] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
          AnimHold[i].Frames[9] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
@@ -219,7 +219,7 @@ void MonsterController::Render(Point Actual) {
          dest.y = TooltipCoords.y;
          dest.w = 300;
          dest.h = 30;
-         SDL_RenderCopy(DefaultRenderer, Tooltip, NULL, &dest);
+         SDL_RenderCopy(DefaultRenderer, Tooltip, nullptr, &dest);
      }
 }
 
@@ -275,7 +275,7 @@ void MonsterController::CreateTooltip(int x, int y, int offsetx, int offsety) {
      if((Mob=MonsterAt(Point(x/32,y/32)))!=-1) {
          SDL_DestroyTexture(Tooltip);
          SDL_Surface * placeHolder = SDL_CreateRGBSurface(0, 300, 30, 32, 0, 0, 0, 0);
-         SDL_FillRect(placeHolder, NULL, SDL_MapRGB(placeHolder->format, 128, 128, 128));
+         SDL_FillRect(placeHolder, nullptr, SDL_MapRGB(placeHolder->format, 128, 128, 128));
           //textprintf_ex(Tooltip, font, 5,5, makecol(0,0,0), -1, "%s", Monsters[Mob].Battle.Name.c_str());
           //textprintf_ex(Tooltip, font, 5,15, makecol(0,0,0), -1, "%i / %i Hitpoints", Monsters[Mob].Battle.Health, Monsters[Mob].Battle.MaxHealth);
          Tooltip = SDL_CreateTextureFromSurface(DefaultRenderer, placeHolder);

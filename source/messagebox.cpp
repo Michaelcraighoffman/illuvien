@@ -6,7 +6,7 @@ IlluvienMessageBox * MsgBox;
 #define TEXT_HEIGHT 10
 
 IlluvienMessageBox::IlluvienMessageBox() {
-    Prerender = NULL;
+    Prerender = nullptr;
      Message NullMessage;
      TextPiece BlankPiece;
      BlankPiece.Color = { 0, 0, 0 };
@@ -61,14 +61,14 @@ void IlluvienMessageBox::AddMessage(Message Msg) {
 void IlluvienMessageBox::ReRender() {
     //It's safe to pass NULL if we haven't prerendered anything yet
     SDL_DestroyTexture(Prerender);
-    Prerender = NULL;
-    SDL_FillRect(SurfacePrerender, NULL, SDL_MapRGB(SurfacePrerender->format, 128, 128, 128 ));
+    Prerender = nullptr;
+    SDL_FillRect(SurfacePrerender, nullptr, SDL_MapRGB(SurfacePrerender->format, 128, 128, 128));
      for(int i=0; i<12; i++) {
           RenderString(SurfacePrerender, i);
      }
 }
 void IlluvienMessageBox::Render() {
-    if (Prerender == NULL) {
+    if (Prerender == nullptr) {
         Prerender = SDL_CreateTextureFromSurface(DefaultRenderer, SurfacePrerender);
     }
     SDL_Rect dest;
@@ -76,7 +76,7 @@ void IlluvienMessageBox::Render() {
     dest.y = 640;
     dest.w = 768;
     dest.h = 128;
-    SDL_RenderCopy(DefaultRenderer, Prerender, NULL, &dest);
+    SDL_RenderCopy(DefaultRenderer, Prerender, nullptr, &dest);
 }
 void IlluvienMessageBox::RenderString(SDL_Surface * Buffer, int Index) {
      int CurrentPixel=0;
@@ -88,7 +88,7 @@ void IlluvienMessageBox::RenderString(SDL_Surface * Buffer, int Index) {
          temptext = TTF_RenderText_Blended(FontManager::GetInterfaceFont(), Messages[Index].Pieces[i].Text.c_str(), Messages[Index].Pieces[i].Color);
          dest.w = temptext->w;
          dest.h = temptext->h;
-         SDL_BlitSurface(temptext, NULL, Buffer, &dest);
+         SDL_BlitSurface(temptext, nullptr, Buffer, &dest);
          dest.x+=temptext->w;
           
      }
