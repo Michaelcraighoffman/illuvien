@@ -232,10 +232,10 @@ void AnimatorController::Render(Point Actual) {
     SDL_Rect dest;
     for (const Animator &current : Animators) {
         Position = current.Position;
-        if (Position.x >= (Actual.x)
-            && Position.x < (Actual.x + 768)
-            && Position.y >= (Actual.y)
-            && Position.y < (Actual.y + 640)){
+        if (Position.x >= (Actual.x-64)
+            && Position.x < (Actual.x + 768+64)
+            && Position.y >= (Actual.y-64)
+            && Position.y < (Actual.y + 640+64)){
             SDL_QueryTexture(current.Animations[0].Frames[0], nullptr, nullptr, &Width, &Height);
             Offsetx = Width - 32;
             Offsety = Height - 32;

@@ -188,10 +188,10 @@ void MonsterController::Render(Point Actual) {
      Point Position;
      for(unsigned int i=0; i<Monsters.size(); i++) {
           Position=Anim->GetPosition(Monsters[i].AnimatorIndex);
-          if(  Position.x >= Actual.x
-               && Position.x < (Actual.x+768)
-               && Position.y >= Actual.y
-               && Position.y < (Actual.y+640)) {
+          if(  Position.x >= (Actual.x-64)
+               && Position.x < (Actual.x+768+64)
+               && Position.y >= (Actual.y-64)
+               && Position.y < (Actual.y+640+64)) {
                     XPos=(Position.x-Actual.x)-(Monsters[i].Size.x-32);
                     YPos=(Position.y-Actual.y)-(Monsters[i].Size.y-32);
                     SDL_Rect dest;  
