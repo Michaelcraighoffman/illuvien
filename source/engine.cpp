@@ -84,7 +84,7 @@ void GameEngine::Loop() {
         //Use the performance counter to avoid the program running too fast
         //and making delta=0
         while ((SDL_GetPerformanceCounter() - performanceLast) / performanceFrequencyMS < 1.0f) { }
-        delta = (SDL_GetPerformanceCounter() - performanceLast) / performanceFrequencyMS;
+        delta = (int)((SDL_GetPerformanceCounter() - performanceLast) / performanceFrequencyMS);
         performanceLast = SDL_GetPerformanceCounter();
         Action(delta);
         Anim->Update(delta);
@@ -106,9 +106,14 @@ void GameEngine::Render(int delta) {
      Anim->Render(Actual);
      MonsterManager->Render(Actual);
      MsgBox->Render();
+     SDL_Surface * fpsSurface = TTF_RenderText_Solid(FontManager::GetOverlayFont(), IntToString(FPS->GetFPS()).c_str(), { 255, 255, 255 });
+     SDL_Texture * fpsTexture = SDL_CreateTextureFromSurface(DefaultRenderer, fpsSurface);
+     SDL_RenderCopy(DefaultRenderer, fpsTexture, NULL, CreateSDLRect(0, 0, fpsSurface->w, fpsSurface->h).get());
      //textprintf_ex(Buffer, font, 0,0, makecol(0,0,0), -1, "%i", FPS->GetFPS());
      //textprintf_ex(Buffer, font, 0,10, makecol(0,0,0), -1, "%i,%i", mouse_x, mouse_y);
      SDL_RenderPresent(DefaultRenderer);
+     SDL_FreeSurface(fpsSurface);
+     SDL_DestroyTexture(fpsTexture);
 }
 
 void GameEngine::InputLoop(int Delta) {

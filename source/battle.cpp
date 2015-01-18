@@ -68,7 +68,7 @@ int BattleManager::CalculateMeleeDamage(BattleInfo Attacker, BattleInfo Defender
           AttackPower=(RandomNumber(Attacker.SkillStrength+Attacker.SkillStrengthMod, (Attacker.SkillStrength+Attacker.SkillStrengthMod)/2)*1.5);
      }
 
-     float DamageMitigation=(Defender.Armor/(100.0*Defender.Level));
+     float DamageMitigation=(Defender.Armor/(100.0f*Defender.Level));
      /* Return the difference between what the strike hit for, and what the defender absorbed */
      int DamageDone=(int)((AttackPower) * (1.0-DamageMitigation));
      if(DamageDone < 0) DamageDone=0;
