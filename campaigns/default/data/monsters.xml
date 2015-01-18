@@ -6,6 +6,7 @@
          <aggrorange>20</aggrorange>
          <meleerange>1</meleerange>
 	    <meleespeed>1000</meleespeed>
+        <movespeed>4</movespeed>
          <level>50</level>
          <experience>0</experience>
          <strength>530</strength>
@@ -26,6 +27,7 @@
          <aggrorange>5</aggrorange>
          <meleerange>1</meleerange>
         <meleespeed>1000</meleespeed>
+        <movespeed>6</movespeed>
          <level>1</level>
          <experience>3</experience>
          <strength>5</strength>
@@ -46,6 +48,7 @@
          <aggrorange>5</aggrorange>
          <meleerange>1</meleerange>
          <meleespeed>1500</meleespeed>
+         <movespeed>2</movespeed>
          <level>50</level>
          <experience>0</experience>
          <strength>530</strength>
@@ -66,6 +69,7 @@
          <aggrorange>5</aggrorange>
          <meleerange>1</meleerange>
          <meleespeed>5000</meleespeed>
+         <movespeed>2</movespeed>
          <level>75</level>
          <experience>0</experience>
          <strength>795</strength>
