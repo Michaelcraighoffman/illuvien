@@ -1,4 +1,5 @@
 #include "globals.h"
+#include <memory>
 
 SDL_Renderer * DefaultRenderer;
 void PopupBox(std::string msg) {
@@ -58,11 +59,12 @@ std::string BooltoString(bool In) {
      return "false";
 }
 
-SDL_Rect CreateSDLRect(int x, int y, int w, int h){
-    SDL_Rect rect;
-    rect.x = x;
-    rect.y = y;
-    rect.w = w;
-    rect.h = h;
-    return rect;
+std::unique_ptr<SDL_Rect> CreateSDLRect(int x, int y, int w, int h){
+    SDL_Rect * rect=new SDL_Rect();
+    rect->x = x;
+    rect->y = y;
+    rect->w = w;
+    rect->h = h;
+    std::unique_ptr<SDL_Rect> ret(rect);
+    return ret;
 }

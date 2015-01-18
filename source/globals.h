@@ -25,6 +25,7 @@
 #include <string>
 #include <sstream>
 #include <stdlib.h>
+#include <memory>
 #include "options.h"
 
 #define   CLASS_WARRIOR 0
@@ -94,5 +95,5 @@ bool Distance(Point A, Point B, int Dist);
 std::string BooltoString(bool In);
 
 /*! Creates an SDL_Rect from the given coordinates */
-SDL_Rect CreateSDLRect(int x, int y, int w, int h);
+std::unique_ptr<SDL_Rect> CreateSDLRect(int x, int y, int w, int h);
 #endif

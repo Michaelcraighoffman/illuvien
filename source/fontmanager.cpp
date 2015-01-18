@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "FontManager.h"
+#include "fontmanager.h"
 #include <string>
 #include "options.h"
 
@@ -25,7 +25,7 @@ TTF_Font * FontManager::Overlay;
 void FontManager::LoadFonts() {
     std::string path = Options::ModDirectory + "/fonts/Vera.ttf";
     Interface = TTF_OpenFont(path.c_str(), 12);
-    path = Options::ModDirectory + "/fonts/VeraBD.ttf";
+    path = Options::ModDirectory + "/fonts/VeraBd.ttf";
     Overlay = TTF_OpenFont(path.c_str(), 12); 
 }
 
