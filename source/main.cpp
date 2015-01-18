@@ -80,8 +80,7 @@ int main(int Argc, char * Argv[]) {
 
 
      if(SetupGraphics(opts, Window)) {
-         Uint64 hold = SDL_GetPerformanceFrequency();
-         DefaultRenderer = SDL_CreateRenderer(Window, -1, 0);
+         DefaultRenderer = SDL_CreateRenderer(Window, -1, SDL_RENDERER_ACCELERATED | (Options::UseVsync ? SDL_RENDERER_PRESENTVSYNC : 0));
           Engine=new GameEngine(Window);
           SDL_ShowCursor(SDL_ENABLE);
           Engine->Setup();
