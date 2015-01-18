@@ -17,6 +17,7 @@
 */
 
 #include "engine.h"
+#include "FontManager.h"
 #include <iostream>
 
 /* The number of milliseconds to wait between rendering frames */
@@ -39,6 +40,7 @@ GameEngine::GameEngine(SDL_Window * activeWindow) {
      MonsterManager=new MonsterController;
      MsgBox=new IlluvienMessageBox;
      Opts=new Options;
+     FontManager::LoadFonts();
     Window=activeWindow;
 }
 

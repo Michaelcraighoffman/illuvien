@@ -80,6 +80,7 @@
     <ClCompile Include="..\source\battle.cpp" />
     <ClCompile Include="..\source\engine.cpp" />
     <ClCompile Include="..\source\error.cpp" />
+    <ClCompile Include="..\source\FontManager.cpp" />
     <ClCompile Include="..\source\fps.cpp" />
     <ClCompile Include="..\source\globals.cpp" />
     <ClCompile Include="..\source\inventory.cpp" />
@@ -99,6 +100,7 @@
     <ClInclude Include="..\source\battle.h" />
     <ClInclude Include="..\source\engine.h" />
     <ClInclude Include="..\source\error.h" />
+    <ClInclude Include="..\source\FontManager.h" />
     <ClInclude Include="..\source\fps.h" />
     <ClInclude Include="..\source\globals.h" />
     <ClInclude Include="..\source\inventory.h" />

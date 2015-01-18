@@ -20,10 +20,12 @@
     Handles the animation for the player, monsters, spell effects, and anything else that changes or moves
     */
 
-//TODO:
-//Lord this code is ugly.  Needs to be greatly simplified.
+//TODO Lord this code is ugly.  Needs to be greatly simplified.
 
 #include "anim.h"
+#include "FontManager.h"
+
+#include <SDL_ttf.h>
 #include <iostream>
 #include <fstream>
 using namespace std;
@@ -108,24 +110,22 @@ int AnimatorController::AddAnimatorOnce(Animation Animations[7], int Frames, Poi
 }
 
 void AnimatorController::AddDamageAnimator(int Amount, Point Location) {
-    ///TODO: implement damage animator
-#ifdef NOTIMPLEMENTED
-    BITMAP * Hold = create_bitmap(30, 10);
-    clear_to_color(Hold, makecol(255, 0, 255));
+    //TODO implement damage animator
+    SDL_Surface * Hold;
     if (Amount > 0)
-        textprintf_ex(Hold, font, 0, 0, makecol(255, 0, 0), -1, "%i", Amount);
+        Hold=TTF_RenderText_Solid(FontManager::GetInterfaceFont(), IntToString(Amount).c_str(), { 255, 0, 0 });
     else
-        textprintf_ex(Hold, font, 0, 0, makecol(0, 255, 0), -1, "%i", Amount);
+        Hold=TTF_RenderText_Solid(FontManager::GetInterfaceFont(), IntToString(Amount).c_str(), { 0, 255, 0 });
     Animation Idle[7];
+    SDL_Texture * final = SDL_CreateTextureFromSurface(DefaultRenderer, Hold);
     for (int i = 0; i < 7; i++) {
         for (int j = 0; j < 10; j++) {
-            Idle[i].Frames[j] = get_rle_sprite(Hold);
+            Idle[i].Frames[j] = final;
         }
     }
     int GUID = AddAnimatorOnce(Idle, 80, Location);
     UpdateAnimator(GUID, Point(Location.x, Location.y - 2));
-    destroy_bitmap(Hold);
-#endif
+    SDL_FreeSurface(Hold);
 }
 
 Point AnimatorController::GetPosition(int GUID) {
