@@ -5,7 +5,7 @@
          <behavior>guard</behavior>
          <aggrorange>20</aggrorange>
          <meleerange>1</meleerange>
-	    <meleespeed>1</meleespeed>
+	    <meleespeed>1000</meleespeed>
          <level>50</level>
          <experience>0</experience>
          <strength>530</strength>
@@ -25,6 +25,7 @@
          <behavior>pursue</behavior>
          <aggrorange>5</aggrorange>
          <meleerange>1</meleerange>
+        <meleespeed>1000</meleespeed>
          <level>1</level>
          <experience>3</experience>
          <strength>5</strength>
@@ -44,7 +45,7 @@
          <behavior>pursue</behavior>
          <aggrorange>5</aggrorange>
          <meleerange>1</meleerange>
-         <meleespeed>8</meleespeed>
+         <meleespeed>1500</meleespeed>
          <level>50</level>
          <experience>0</experience>
          <strength>530</strength>
@@ -64,7 +65,7 @@
          <behavior>guard</behavior>
          <aggrorange>5</aggrorange>
          <meleerange>1</meleerange>
-         <meleespeed>10</meleespeed>
+         <meleespeed>5000</meleespeed>
          <level>75</level>
          <experience>0</experience>
          <strength>795</strength>

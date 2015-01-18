@@ -127,6 +127,7 @@ void ItemHandler::ProcessTag(IlluvienXMLTag Tag) {
 }
 
 SPRITE_REF * ItemHandler::LoadIcon(int ID) {
+    //TODO Implement ItemHandler::LoadIcon
 #ifdef UNIMPLEMENTED
 	for(unsigned int i=0; i<IconCache.size(); i++) {
 		if(IconCache[i]->ID==ID)

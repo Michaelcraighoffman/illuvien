@@ -76,16 +76,21 @@ void GameEngine::Setup() {
      MonsterManager->AddMonster("Zombie", "Mindless Servant", Point(21, 15), ALLY_HOSTILE);
 }
 void GameEngine::Loop() {
-    int last= SDL_GetTicks();
-    int delta=0;
+    int delta=1;
+    double performanceFrequencyMS = SDL_GetPerformanceFrequency()/1000.0f;
+    Uint64 performanceLast = SDL_GetPerformanceCounter();
     while(!GameDone) {
-        delta=SDL_GetTicks()-last;
-        last = SDL_GetTicks();
+        //SDL_Delay can take up to 15ms to return because of scheduling
+        //Use the performance counter to avoid the program running too fast
+        //and making delta=0
+        while ((SDL_GetPerformanceCounter() - performanceLast) / performanceFrequencyMS < 1.0f) { }
+        delta = (SDL_GetPerformanceCounter() - performanceLast) / performanceFrequencyMS;
+        performanceLast = SDL_GetPerformanceCounter();
         Action(delta);
         Anim->Update(delta);
         Render(delta);
         InputLoop(delta);
-        SDL_Delay(1);
+        if (delta = 0) { Error->ReportError(ERROR_SEVERITY_LOG, "Got 0 delta"); }
      }
 }
 void GameEngine::Render(int delta) {

@@ -1,4 +1,5 @@
 #include "messagebox.h"
+#include "FontManager.h"
 
 IlluvienMessageBox * MsgBox;
 
@@ -14,7 +15,6 @@ IlluvienMessageBox::IlluvienMessageBox() {
      for(int i=0; i<12; i++) {
           Messages.push_back(NullMessage);
      }
-     Font=TTF_OpenFont("Arial.TTF", 12);
      SurfacePrerender = SDL_CreateRGBSurface(0, 768, 128, 32, 0, 0, 0, 0);
 }
 
@@ -22,7 +22,6 @@ IlluvienMessageBox::~IlluvienMessageBox() {
      for(int i=0; i<12; i++) {
           Messages[i].Pieces.clear();
      }
-     TTF_CloseFont(Font);
      SDL_DestroyTexture(Prerender);
      SDL_FreeSurface(SurfacePrerender);
 }
@@ -86,7 +85,7 @@ void IlluvienMessageBox::RenderString(SDL_Surface * Buffer, int Index) {
      dest.x = 0;
      dest.y = Index*TEXT_HEIGHT;
      for(unsigned int i=0; i<Messages[Index].Pieces.size(); i++) {
-         temptext = TTF_RenderText_Blended(Font, Messages[Index].Pieces[i].Text.c_str(), Messages[Index].Pieces[i].Color);
+         temptext = TTF_RenderText_Blended(FontManager::GetInterfaceFont(), Messages[Index].Pieces[i].Text.c_str(), Messages[Index].Pieces[i].Color);
          dest.w = temptext->w;
          dest.h = temptext->h;
          SDL_BlitSurface(temptext, NULL, Buffer, &dest);

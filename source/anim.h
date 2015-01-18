@@ -66,8 +66,12 @@ struct Animator {
      int GUID;
      /*! The current Frame of animation the animator is in */
      int CurrentFrame;
-     /*! The number of Frames a simple animation goes through being deleted */
-     int SimpleEnd;
+     /*! The number of Milliseconds a animation lasts */
+     int Duration;
+     /*! The number of Milliseconds since the current Animation began */
+     int FrameTime;
+     /*! The number of Milliseconds since the animator last moved */
+     int LastMovement;
      /*! Whether or not the Animator is currently idle */
      bool Idle;
 };
@@ -92,7 +96,7 @@ class AnimatorController {
           bool CompareAnimators(int A, int B);
           //!  Adds an animator
           /*!  Uses the given values to prepare an Animator struct, then adds it to the Animators vector. */
-          int AddAnimator(int Type, Animation Animations[7], Point Location);
+          int AddAnimator(int Type, int Duration, Animation Animations[7], Point Location);
           //!  Adds an animator which is shown once
           /*!  Uses the given values to prepare an Animator struct, then adds it to the Animators vector. */
           int AddAnimatorOnce(Animation Animations[7], int Frames, Point Location);

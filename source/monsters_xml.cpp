@@ -103,6 +103,11 @@ void MonsterController::ProcessTag(IlluvienXMLTag Tag, Monster * Current) {
           Current->Battle.MeleeSpeed=StringToInt(Tag.Data);
           Current->Battle.MeleeCooldown=0;
      }
+     else if (Tag.Name == "movespeed") {
+         //Convert from Tiles/second to Milliseconds/Tile
+         Current->MovementSpeed = 1000/StringToInt(Tag.Data);
+         Current->MovementCooldown = 0;
+     }
      else {
           Error->ReportError(ERROR_SEVERITY_WARN, "Parsed Unknown Tag: "+Tag.Name+" with data: "+Tag.Data);
      }

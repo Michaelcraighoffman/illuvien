@@ -131,24 +131,24 @@ void MonsterController::LoadImages(Monster &Out) {
          src.y = i*(Data->h / 7);
          SDL_BlitSurface(Data, &src, Image, NULL);
          AnimHold[i].Frames[0] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
-         src.x = 32;
+         src.x += (Data->w / 4);
          SDL_BlitSurface(Data, &src, Image, NULL);
          AnimHold[i].Frames[1] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
          AnimHold[i].Frames[2] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
          AnimHold[i].Frames[3] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
-         src.x = 64;
+         src.x += (Data->w / 4);
          SDL_BlitSurface(Data, &src, Image, NULL);
          AnimHold[i].Frames[4] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
          AnimHold[i].Frames[5] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
          AnimHold[i].Frames[6] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
-         src.x = 96;
+         src.x += (Data->w / 4);
          SDL_BlitSurface(Data, &src, Image, NULL);
          AnimHold[i].Frames[7] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
          AnimHold[i].Frames[8] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
          AnimHold[i].Frames[9] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
      }
      SDL_FreeSurface(Image);
-     Out.AnimatorIndex=Anim->AddAnimator(ANIM_FULL, AnimHold, Out.Spawn);
+     Out.AnimatorIndex=Anim->AddAnimator(ANIM_FULL, Out.MovementSpeed, AnimHold, Out.Spawn);
      SDL_FreeSurface(Data);
      delete Opts;
 }
@@ -162,6 +162,8 @@ void MonsterController::MoveMonsters(int Delta) {
   
           if(Monsters[i].Battle.MeleeCooldown > 0)
                Monsters[i].Battle.MeleeCooldown-=Delta;
+          if (Monsters[i].MovementCooldown > 0)
+              Monsters[i].MovementCooldown -= Delta;
           switch(Monsters[i].Behavior) {
                case BEHAVIOR_GUARD:
                     MonsterAIGuard(i);

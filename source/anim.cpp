@@ -32,12 +32,6 @@ using namespace std;
 AnimatorController * Anim;
 
 
-//! The time, in MS, since we last updated the animator
-int AnimationTicks = 0;
-
-//! The number of milliseconds between Animator ticks
-#define ANIMATION_TICK_MS 25
-
 bool AnimatorController::CompareAnimators(int A, int B) {
     bool AisSimple = false, BisSimple = false;
     if (Animators[A].Type == ANIM_ONCE || Animators[A].Type == ANIM_SIMPLE)
@@ -65,7 +59,7 @@ static bool Compare(int A, int B) {
 
 AnimatorController::AnimatorController()
 {
-    AnimationTicks = 0;
+
 }
 
 AnimatorController::~AnimatorController() {
@@ -73,7 +67,7 @@ AnimatorController::~AnimatorController() {
     RequireSort = true;
 }
 
-int AnimatorController::AddAnimator(int Type, Animation Animations[7], Point Location) {
+int AnimatorController::AddAnimator(int Type, int Duration, Animation Animations[7], Point Location) {
     Animator New;
     New.Type = Type;
     New.Action = ANIM_IDLE;
@@ -86,11 +80,14 @@ int AnimatorController::AddAnimator(int Type, Animation Animations[7], Point Loc
     New.Destination.y = Location.y * 32;
     New.GUID = RandomNumber(0, 1000000);
     New.CurrentFrame = 0;
+    New.FrameTime = 0;
+    New.LastMovement = 0;
+    New.Duration = Duration;
     Animators.push_back(New);
     RenderList.push_back(Animators.size() - 1);
     return New.GUID;
 }
-int AnimatorController::AddAnimatorOnce(Animation Animations[7], int Frames, Point Location) {
+int AnimatorController::AddAnimatorOnce(Animation Animations[7], int Time, Point Location) {
     Animator New;
     New.Type = ANIM_ONCE;
     New.Action = ANIM_IDLE;
@@ -103,19 +100,20 @@ int AnimatorController::AddAnimatorOnce(Animation Animations[7], int Frames, Poi
     New.Destination.y = Location.y * 32;
     New.GUID = RandomNumber(0, 1000000);
     New.CurrentFrame = 0;
-    New.SimpleEnd = Frames;
+    New.Duration = Time;
+    New.FrameTime = 0;
+    New.LastMovement = 0;
     Animators.push_back(New);
     RenderList.push_back(Animators.size() - 1);
     return New.GUID;
 }
 
 void AnimatorController::AddDamageAnimator(int Amount, Point Location) {
-    //TODO implement damage animator
     SDL_Surface * Hold;
     if (Amount > 0)
-        Hold=TTF_RenderText_Solid(FontManager::GetInterfaceFont(), IntToString(Amount).c_str(), { 255, 0, 0 });
+        Hold=TTF_RenderText_Solid(FontManager::GetOverlayFont(), IntToString(Amount).c_str(), { 255, 0, 0 });
     else
-        Hold=TTF_RenderText_Solid(FontManager::GetInterfaceFont(), IntToString(Amount).c_str(), { 0, 255, 0 });
+        Hold=TTF_RenderText_Solid(FontManager::GetOverlayFont(), IntToString(Amount).c_str(), { 0, 255, 0 });
     Animation Idle[7];
     SDL_Texture * final = SDL_CreateTextureFromSurface(DefaultRenderer, Hold);
     for (int i = 0; i < 7; i++) {
@@ -123,8 +121,8 @@ void AnimatorController::AddDamageAnimator(int Amount, Point Location) {
             Idle[i].Frames[j] = final;
         }
     }
-    int GUID = AddAnimatorOnce(Idle, 80, Location);
-    UpdateAnimator(GUID, Point(Location.x, Location.y - 2));
+    int GUID = AddAnimatorOnce(Idle, 500, Location);
+    UpdateAnimator(GUID, Point(Location.x, Location.y - 1));
     SDL_FreeSurface(Hold);
 }
 
@@ -158,6 +156,8 @@ void AnimatorController::UpdateAnimator(unsigned int GUID, int Action, bool make
         Animators[ID].Action = Action;
         Animators[ID].Idle = false;
         Animators[ID].CurrentFrame = 0;
+        Animators[ID].FrameTime = 0;
+        Animators[ID].LastMovement = 0;
         if (makeIdle == true) {
             Animators[ID].Idle = true;
         }
@@ -170,6 +170,8 @@ void AnimatorController::UpdateAnimator(unsigned int GUID, Point Position, bool 
         Animators[ID].Destination.y = Position.y * 32;
         Animators[ID].Idle = false;
         Animators[ID].CurrentFrame = 0;
+        Animators[ID].FrameTime = 0;
+        Animators[ID].LastMovement = 0;
         if (makeIdle == true) {
             Animators[ID].Idle = true;
         }
@@ -183,6 +185,8 @@ void AnimatorController::UpdateAnimator(unsigned int GUID, int Action, Point Pos
         Animators[ID].Destination.y = Position.y * 32;
         Animators[ID].Idle = false;
         Animators[ID].CurrentFrame = 0;
+        Animators[ID].FrameTime = 0;
+        Animators[ID].LastMovement = 0;
         if (makeIdle == true) {
             Animators[ID].Idle = true;
         }
@@ -190,27 +194,31 @@ void AnimatorController::UpdateAnimator(unsigned int GUID, int Action, Point Pos
 }
 
 void AnimatorController::MoveTowardsDestination(int ID) {
-    if (Animators[ID].Destination.x > (Animators[ID].Position.x)) {
-        Animators[ID].Position.x += 4;
-        if (Animators[ID].Destination.x < (Animators[ID].Position.x))
-            Animators[ID].Position.x = Animators[ID].Destination.x;
+    int PixelTime = ((Animators[ID].Duration / 10) / 3);
+    while (Animators[ID].LastMovement >= PixelTime) {
+        Animators[ID].LastMovement -= PixelTime;
+        if (Animators[ID].Destination.x > (Animators[ID].Position.x)) {
+            Animators[ID].Position.x += 1;
+            if (Animators[ID].Destination.x < (Animators[ID].Position.x))
+                Animators[ID].Position.x = Animators[ID].Destination.x;
+        }
+        else if (Animators[ID].Destination.x < (Animators[ID].Position.x)) {
+            Animators[ID].Position.x -= 1;
+            if (Animators[ID].Destination.x >(Animators[ID].Position.x))
+                Animators[ID].Position.x = Animators[ID].Destination.x;
+        }
+        if (Animators[ID].Destination.y >(Animators[ID].Position.y)) {
+            Animators[ID].Position.y += 1;
+            if (Animators[ID].Destination.y < (Animators[ID].Position.y))
+                Animators[ID].Position.y = Animators[ID].Destination.y;
+        }
+        else if (Animators[ID].Destination.y < (Animators[ID].Position.y)) {
+            Animators[ID].Position.y -= 1;
+            if (Animators[ID].Destination.y >(Animators[ID].Position.y))
+                Animators[ID].Position.y = Animators[ID].Destination.y;
+        }
+        RequireSort = true;
     }
-    else if (Animators[ID].Destination.x < (Animators[ID].Position.x)) {
-        Animators[ID].Position.x -= 4;
-        if (Animators[ID].Destination.x >(Animators[ID].Position.x))
-            Animators[ID].Position.x = Animators[ID].Destination.x;
-    }
-    if (Animators[ID].Destination.y >(Animators[ID].Position.y)) {
-        Animators[ID].Position.y += 4;
-        if (Animators[ID].Destination.y < (Animators[ID].Position.y))
-            Animators[ID].Position.y = Animators[ID].Destination.y;
-    }
-    else if (Animators[ID].Destination.y < (Animators[ID].Position.y)) {
-        Animators[ID].Position.y -= 4;
-        if (Animators[ID].Destination.y >(Animators[ID].Position.y))
-            Animators[ID].Position.y = Animators[ID].Destination.y;
-    }
-    RequireSort = true;
 }
 
 int AnimatorController::GUIDtoID(int GUID) {
@@ -233,25 +241,23 @@ void AnimatorController::Update(int delta) {
         sort(RenderList.begin(), RenderList.end(), Compare);
         RequireSort = false;
     }
-    AnimationTicks += delta;
-    if (AnimationTicks > ANIMATION_TICK_MS) {
-        for (unsigned int i = 0; i<Animators.size(); i++) {
-            Animators[i].CurrentFrame ++;
-            MoveTowardsDestination(i);
-            if (Animators[i].CurrentFrame>9) {
-                Animators[i].CurrentFrame = 0;
-                if (Animators[i].Type == ANIM_FULL) {
-                    Animators[i].Idle = true;
-                    Animators[i].Position = Animators[i].Destination;
-                }
+    Animator current;
+    for (unsigned int i = 0; i<Animators.size(); i++) {
+        Animators[i].FrameTime += delta;
+        Animators[i].LastMovement += delta;
+        MoveTowardsDestination(i);
+        Animators[i].CurrentFrame = (Animators[i].FrameTime / (Animators[i].Duration / 10));
+        if (Animators[i].CurrentFrame > 9) {
+            Animators[i].FrameTime -= Animators[i].Duration;
+            Animators[i].CurrentFrame = 0;
+            if (Animators[i].Type == ANIM_FULL) {
+                Animators[i].Idle = true;
+                Animators[i].Position = Animators[i].Destination;
             }
-            if (Animators[i].Type == ANIM_ONCE) {
-                Animators[i].SimpleEnd -= AnimationTicks;
-                if (Animators[i].SimpleEnd <= 0)
-                    RemoveAnimatorID(i);
+            else if (Animators[i].Type == ANIM_ONCE) {
+                RemoveAnimatorID(i);
             }
         }
-        AnimationTicks -= ANIMATION_TICK_MS ;
     }
 }
 void AnimatorController::Render(Point Actual) {

@@ -53,6 +53,13 @@ class Monster {
           int LeashDistance;
           /*! The position the monster spawned at */
           Point Spawn;
+
+          /*! The cooldown remaining before the monster can move again */
+          int MovementCooldown;
+
+          /*! The number of tiles per second the monster can move */
+          int MovementSpeed;
+
           /*! The amount of experience the monster gives when killed */
           int Experience;
           /*! The amount of Gold the monster gives when killed */

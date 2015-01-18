@@ -64,6 +64,9 @@ void MonsterController::MonsterAIPursue(int i) {
      to ensure it does not violate leash distance, or walk on unpassable tiles
 */
 void MonsterController::MoveTowardPosition(int i, Point Destination) {
+   
+    if (Monsters[i].MovementCooldown > 0) 
+        return; //We can't move yet
      Point NewPosition=Monsters[i].Position;
      if(Destination.y > Monsters[i].Position.y) {
           NewPosition.y++;
@@ -92,6 +95,7 @@ void MonsterController::MoveTowardPosition(int i, Point Destination) {
           }
      }
      if((Monsters[i].Position!=NewPosition)) {
+         Monsters[i].MovementCooldown = Monsters[i].MovementSpeed;
           AdjustFacing(i, NewPosition);
           Monsters[i].Position=NewPosition;
           Anim->UpdateAnimator(Monsters[i].AnimatorIndex, NewPosition);

@@ -24,9 +24,11 @@ class FontManager
 {
     private:
         static TTF_Font * Interface;
+        static TTF_Font * Overlay;
     public:
         static void LoadFonts();
         static TTF_Font * GetInterfaceFont();
+        static TTF_Font * GetOverlayFont();
 };
 
 

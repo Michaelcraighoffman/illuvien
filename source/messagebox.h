@@ -54,8 +54,6 @@ class IlluvienMessageBox {
           /*! Background image for the messagebox */
           SDL_Texture * MessageBoxImage;   
 
-          /*! Font to use for the Message Box*/
-          TTF_Font * Font;
           /*! Pre-Rendering of the messagebox */
           SDL_Surface * SurfacePrerender;
           /*! Pre-Rendering of the messagebox */ 
