@@ -23,7 +23,7 @@
 //TODO Lord this code is ugly.  Needs to be greatly simplified.
 
 #include "anim.h"
-#include "FontManager.h"
+#include "fontmanager.h"
 
 #include <SDL_ttf.h>
 #include <iostream>

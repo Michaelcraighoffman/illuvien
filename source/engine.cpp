@@ -17,7 +17,7 @@
 */
 
 #include "engine.h"
-#include "FontManager.h"
+#include "fontmanager.h"
 #include <iostream>
 
 /* The number of milliseconds to wait between rendering frames */
