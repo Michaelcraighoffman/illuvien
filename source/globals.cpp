@@ -2,6 +2,8 @@
 #include <memory>
 
 SDL_Renderer * DefaultRenderer;
+ErrorHandler * GlobalError;
+
 void PopupBox(std::string msg) {
      PopupBox(msg.c_str());
 }

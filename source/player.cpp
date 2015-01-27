@@ -36,67 +36,23 @@ PlayerController::~PlayerController() {
 }
 
 void PlayerController::Setup() {
-     Options * Opts=new Options;
-     SDL_Surface * Image;
      Position.x=21;
      Position.y=11;
      Destination=Position;
-     std::string Path=Opts->ModDirectory+"/images/player/priest/priest.bmp";
-     SDL_Surface * Data = IMG_Load(Path.c_str());
-     if(!Data) {
-          Error->ReportError(ERROR_SEVERITY_FATAL, "Could not load image: Priest");
-     }
-     std::array<Animation, NUM_ANIMATIONS> AnimHold;
-     SDL_Rect src;
-     src.w = Data->w / 4;
-     src.h = Data->h / NUM_ANIMATIONS;
-     Image = SDL_CreateRGBSurface(0, Data->w / 4, Data->h / NUM_ANIMATIONS, 32, 0, 0, 0, 0);
-     SDL_SetColorKey(Image, SDL_TRUE, SDL_MapRGB(Image->format, 255, 0, 255));
-     for (int i = 0; i<NUM_ANIMATIONS; i++) {
-         
-         if (!Image)
-             Error->ReportError(ERROR_SEVERITY_FATAL, "Could not create Bitmap");
-         src.x = 0;
-         src.y = i*(Data->h / NUM_ANIMATIONS);
-         SDL_BlitSurface(Data, &src, Image, nullptr);
-         AnimHold[i].Frames[0] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
-         src.x += (Data->w / 4);
-         SDL_BlitSurface(Data, &src, Image, nullptr);
-         AnimHold[i].Frames[1] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
-         AnimHold[i].Frames[2] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
-         AnimHold[i].Frames[3] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
-         src.x += (Data->w / 4);
-         SDL_BlitSurface(Data, &src, Image, nullptr);
-         AnimHold[i].Frames[4] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
-         AnimHold[i].Frames[5] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
-         AnimHold[i].Frames[6] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
-         src.x += (Data->w / 4);
-         SDL_BlitSurface(Data, &src, Image, nullptr);
-         AnimHold[i].Frames[7] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
-         AnimHold[i].Frames[8] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
-         AnimHold[i].Frames[9] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
-     }
-     SDL_FreeSurface(Image);
-
-     AnimationIndex=Anim->AddAnimator(ANIM_FULL, 200, AnimHold, Position);
-     SDL_FreeSurface(Data);
-     delete Opts;
+     std::string Path=Options::ModDirectory+"/images/player/priest/priest.bmp";
+     PlayerAnimator = new Animator();
+     PlayerAnimator->Create(ANIM_FULL, 200, Path, Position);
+     Anim->AddAnimator(PlayerAnimator);
 }
 
 Point PlayerController::GetPosition() {
      return Position;
 }
+
 Point PlayerController::GetPixelPosition() {
-     return Anim->GetPosition(AnimationIndex);
+    return PlayerAnimator->GetPosition();
 }
 
-void PlayerController::SetPosition(Point New) {
-     Position=New;
-     Anim->UpdateAnimator(AnimationIndex, New);
-}
-void PlayerController::SetAnim(int New) {
-     Anim->UpdateAnimator(AnimationIndex, New);
-}
 void PlayerController::SetDestination(Point To, int Anim) {
      Destination=To;
      NewAnim=Anim;
@@ -107,7 +63,7 @@ void PlayerController::PlayerAction(int delta) {
     LastAction-=ENGINE_TICK_MS;
 
     if(Position!=Destination) {
-          Anim->UpdateAnimator(AnimationIndex, NewAnim, Destination);
+          PlayerAnimator->UpdateAnimator(NewAnim, Destination);
           Position=Destination;
      }
 }

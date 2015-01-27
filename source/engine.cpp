@@ -29,6 +29,7 @@ int LastFrame;
 GameEngine::GameEngine(SDL_Window * activeWindow) {
      Map=new MapController;
      Error=new ErrorHandler("Engine", ERROR_SEVERITY_LOG, false);
+     GlobalError = new ErrorHandler("Global", ERROR_SEVERITY_LOG, false);
      Player=new PlayerController;
      Anim=new AnimatorController;
      FPS=new FPSTimer;

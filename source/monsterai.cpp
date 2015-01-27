@@ -33,7 +33,7 @@ void MonsterController::MonsterAIGuard(int i) {
           MoveTowardPosition(i, Monsters[i].Spawn);
      }
      if(Monsters[i].Position==Monsters[i].Spawn) {
-          Anim->UpdateAnimator(Monsters[i].AnimatorIndex, ANIM_SOUTH, true);
+          Monsters[i].MonsterAnimator->UpdateAnimator(ANIM_SOUTH, true);
      }
 }
 
@@ -98,7 +98,7 @@ void MonsterController::MoveTowardPosition(int i, Point Destination) {
          Monsters[i].MovementCooldown = Monsters[i].MovementSpeed;
           AdjustFacing(i, NewPosition);
           Monsters[i].Position=NewPosition;
-          Anim->UpdateAnimator(Monsters[i].AnimatorIndex, NewPosition);
+          Monsters[i].MonsterAnimator->UpdateAnimator(NewPosition);
      }
      
 }
@@ -182,7 +182,7 @@ void MonsterController::Wander(int i) {
           abs(NewPosition.y-Monsters[i].Spawn.y) < Monsters[i].LeashDistance) &&
           Map->IsPassable(NewPosition, MAP_FOOTPASSABLE) && MonsterAt(NewPosition)==-1) {
                Monsters[i].Position=NewPosition;
-               Anim->UpdateAnimator(Monsters[i].AnimatorIndex,Direction,NewPosition);
+               Monsters[i].MonsterAnimator->UpdateAnimator(Direction, NewPosition);
      }
 }
 
@@ -305,13 +305,13 @@ void MonsterController::AdjustFacing(int Which, Point Target) {
      if(abs(Xdist) > abs(Ydist)) {
           if(Xdist < 0) {
                if(Monsters[Which].Facing!=ANIM_EAST) {
-                    Anim->UpdateAnimator(Monsters[Which].AnimatorIndex,ANIM_EAST, true);
+                   Monsters[Which].MonsterAnimator->UpdateAnimator(ANIM_EAST, true);
                     Monsters[Which].Facing=ANIM_EAST;
                }
           }
           else {
                if(Monsters[Which].Facing !=ANIM_WEST) {
-                    Anim->UpdateAnimator(Monsters[Which].AnimatorIndex,ANIM_WEST, true);
+                   Monsters[Which].MonsterAnimator->UpdateAnimator(ANIM_WEST, true);
                     Monsters[Which].Facing=ANIM_WEST;
                }
           }
@@ -319,13 +319,13 @@ void MonsterController::AdjustFacing(int Which, Point Target) {
      else if(abs(Xdist) < abs(Ydist)){
           if(Ydist < 0) {
                if(Monsters[Which].Facing != ANIM_SOUTH) {
-                    Anim->UpdateAnimator(Monsters[Which].AnimatorIndex,ANIM_SOUTH, true);
+                   Monsters[Which].MonsterAnimator->UpdateAnimator(ANIM_SOUTH, true);
                     Monsters[Which].Facing=ANIM_SOUTH;
                }
           }
           else {
                if(Monsters[Which].Facing !=ANIM_NORTH) {
-                    Anim->UpdateAnimator(Monsters[Which].AnimatorIndex,ANIM_NORTH, true);
+                   Monsters[Which].MonsterAnimator->UpdateAnimator(ANIM_NORTH, true);
                     Monsters[Which].Facing=ANIM_NORTH;
                }
           }

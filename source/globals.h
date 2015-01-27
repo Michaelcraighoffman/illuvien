@@ -44,7 +44,8 @@
 #define   BEHAVIOR_PURSUE     1    /*   The monster will wander until it aggros, then pursue enemies indefinitely*/
 #define   BEHAVIOR_WANDER     2    /*   The monster will wander, regardless of aggro*/
 
-extern SDL_Renderer * DefaultRenderer; 
+extern SDL_Renderer * DefaultRenderer;
+extern ErrorHandler * GlobalError;
 
 //! Structure defining a simple x,y pair
 class Point {

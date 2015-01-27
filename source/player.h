@@ -41,20 +41,17 @@ class PlayerController {
           Point Destination;
           int NewAnim;
           bool Mounted;
-          int AnimationIndex;
+          Animator * PlayerAnimator;
           PlayerStatistics Statistics;
      public:
           PlayerController();
-          ~PlayerController();
-          Point GetPosition();
-          Point GetPixelPosition() ;
+          ~PlayerController(); 
           void Setup();
-          void SetPosition(Point New);
-          void SetAnim(int Anim);
           void SetDestination(Point To, int Anim);
           void PlayerAction(int delta);
           int GetMountStatus();
-
+          Point GetPosition();
+          Point GetPixelPosition();
           void DamagePlayer(int Amt);
           bool CheckDead();
 

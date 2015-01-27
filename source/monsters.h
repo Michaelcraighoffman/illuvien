@@ -70,8 +70,8 @@ class Monster {
 
           /*! The filename of this monster's images */
           std::string Graphic;
-          /*! The index of this monster's animator */
-          int AnimatorIndex;
+          /*! This monster's animator */
+          Animator * MonsterAnimator;
           /*! The direction the monster is currently facing */
           int Facing;
           /*! The size of the monster (in pixels) */

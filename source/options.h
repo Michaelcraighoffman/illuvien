@@ -29,20 +29,20 @@
 
 class Options {
      public:
-          static bool UseFullscreen;         /* Whether or not we are allowed to use a fullscreen window */
-          static bool UseVsync;              /* Whether or not we are allowed to use vsync */
-          static bool UseVRAM;               /* Whether or not we should try video memory */
-          static bool UseDirectx;            /* Whether or not we should try to use DirectX video modes */
-          static int Framerate;              /* The desired framerate, 0 for unlimitied */
-          static int CurrentMode;            /* The current graphics mode we are in */
-          static int CombatVerbose;          /* The verbosity of combat messages */
-		static int IconCache;			/* The number of item icons to keep in memory before deleting */
-          static std::string ModDirectory;   /* The current directory to pull files out of */
-          Options();
-          Options(bool);
-          ~Options();
-          void ProcessTag(IlluvienXMLTag Tag);
-          void SaveOptions();
+         static bool UseFullscreen;         /* Whether or not we are allowed to use a fullscreen window */
+         static bool UseVsync;              /* Whether or not we are allowed to use vsync */
+         static bool UseVRAM;               /* Whether or not we should try video memory */
+         static bool UseDirectx;            /* Whether or not we should try to use DirectX video modes */
+         static int Framerate;              /* The desired framerate, 0 for unlimitied */
+         static int CurrentMode;            /* The current graphics mode we are in */
+         static int CombatVerbose;          /* The verbosity of combat messages */
+         static int IconCache;			/* The number of item icons to keep in memory before deleting */
+         static std::string ModDirectory;   /* The current directory to pull files out of */
+         Options();
+         Options(bool);
+         ~Options();
+         void ProcessTag(IlluvienXMLTag Tag);
+         void SaveOptions();
 };
 
 #endif

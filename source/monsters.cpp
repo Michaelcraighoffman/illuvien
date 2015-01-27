@@ -108,49 +108,10 @@ bool MonsterController::AddMonster(std::string SearchName, std::string NewName, 
      Usally performed after one of the AddMonster variants.
 */
 void MonsterController::LoadImages(Monster &Out) {
-     Options * Opts=new Options;
-     SDL_Surface * Image;
-     std::string Path=Opts->ModDirectory+"/images/monsters/"+Out.Graphic;
-     SDL_Surface * Data=IMG_Load(Path.c_str());
-     if(!Data) {
-          Error->ReportError(ERROR_SEVERITY_FATAL, "Could not load image: "+Out.Graphic);
-     }
-     Out.Size.x=Data->w/4;
-     Out.Size.y = Data->h / NUM_ANIMATIONS;
-     std::array<Animation, NUM_ANIMATIONS> AnimHold;
-     SDL_Rect src;
-     src.w = Data->w / 4;
-     src.h = Data->h / NUM_ANIMATIONS;
-     Image = SDL_CreateRGBSurface(0, Data->w / 4, Data->h / NUM_ANIMATIONS, 32, 0, 0, 0, 0);
-     SDL_SetColorKey(Image, SDL_TRUE, SDL_MapRGB(Image->format, 255, 0, 255));
-     for (int i = 0; i<NUM_ANIMATIONS; i++) {
-
-         if (!Image)
-             Error->ReportError(ERROR_SEVERITY_FATAL, "Could not create Bitmap");
-         src.x = 0;
-         src.y = i*(Data->h / NUM_ANIMATIONS);
-         SDL_BlitSurface(Data, &src, Image, nullptr);
-         AnimHold[i].Frames[0] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
-         src.x += (Data->w / 4);
-         SDL_BlitSurface(Data, &src, Image, nullptr);
-         AnimHold[i].Frames[1] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
-         AnimHold[i].Frames[2] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
-         AnimHold[i].Frames[3] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
-         src.x += (Data->w / 4);
-         SDL_BlitSurface(Data, &src, Image, nullptr);
-         AnimHold[i].Frames[4] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
-         AnimHold[i].Frames[5] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
-         AnimHold[i].Frames[6] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
-         src.x += (Data->w / 4);
-         SDL_BlitSurface(Data, &src, Image, nullptr);
-         AnimHold[i].Frames[7] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
-         AnimHold[i].Frames[8] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
-         AnimHold[i].Frames[9] = SDL_CreateTextureFromSurface(DefaultRenderer, Image);
-     }
-     SDL_FreeSurface(Image);
-     Out.AnimatorIndex=Anim->AddAnimator(ANIM_FULL, Out.MovementSpeed, AnimHold, Out.Spawn);
-     SDL_FreeSurface(Data);
-     delete Opts;
+     std::string Path=Options::ModDirectory+"/images/monsters/"+Out.Graphic;
+     Out.MonsterAnimator = new Animator();
+     Out.MonsterAnimator->Create(ANIM_FULL, Out.MovementSpeed, Path, Out.Spawn);
+     Anim->AddAnimator(Out.MonsterAnimator);
 }
 
 /*
@@ -187,7 +148,7 @@ void MonsterController::Render(Point Actual) {
      int XPos, YPos;
      Point Position;
      for(unsigned int i=0; i<Monsters.size(); i++) {
-          Position=Anim->GetPosition(Monsters[i].AnimatorIndex);
+         Position = Monsters[i].MonsterAnimator->GetPosition();
           if(  Position.x >= (Actual.x-64)
                && Position.x < (Actual.x+768+64)
                && Position.y >= (Actual.y-64)
@@ -250,7 +211,7 @@ void MonsterController::CheckDead() {
      for(unsigned int i=0; i<Monsters.size(); i++) {
           if(Monsters[i].Battle.Health <= 0) {
                RemoveFromThreatTables(i);
-               Anim->RemoveAnimatorGUID(Monsters[i].AnimatorIndex);
+               Monsters[i].MonsterAnimator->FinishAnimation();
                Monsters.erase(Monsters.begin()+i);
                ReacquireThreat();
           }
