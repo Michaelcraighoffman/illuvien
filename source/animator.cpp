@@ -28,7 +28,6 @@ Animator::~Animator() {
             SDL_DestroyTexture(t);
         }
     }
-
 }
 
 bool Animator::operator<(const Animator &B) {
@@ -51,7 +50,6 @@ bool Animator::operator<(const Animator &B) {
 }
 
 void Animator::LoadImages(std::string Path) {
-    Options * Opts = new Options;
     SDL_Surface * Image;
     SDL_Surface * Data = IMG_Load(Path.c_str());
     if (!Data) {
@@ -91,7 +89,6 @@ void Animator::LoadImages(std::string Path) {
     }
     SDL_FreeSurface(Image);
     SDL_FreeSurface(Data);
-    delete Opts;
 }
 
 
@@ -156,8 +153,15 @@ Point Animator::GetPosition() {
     return Position;
 }
 
+Point Animator::GetDimensions() {
+    int Width, Height;
+    SDL_QueryTexture(Animations[0].Frames[0], nullptr, nullptr, &Width, &Height);
+    return Point(Width, Height);
+}
+
 void Animator::MoveTowardsDestination() {
     int PixelTime = ((Duration / 10) / 3);
+    if (PixelTime <= 0) return;
     while (LastMovement >= PixelTime) {
         LastMovement -= PixelTime;
         if (Destination.x > (Position.x)) {

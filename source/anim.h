@@ -37,9 +37,6 @@ class AnimatorController {
      protected:
 		/*! All the animators */
          std::vector <Animator *> Animators;
-
-		/*! Whether or not some action has occured to require the Animators to be resorted before a render */
-          bool RequireSort;
      public:
          AnimatorController();
 
@@ -49,7 +46,6 @@ class AnimatorController {
           /*!  Inserts the given animator into the Animators vector. */
           bool AddAnimator(Animator * anim);
           //!  Adds an animator to show damage
-          /*!  Creates a bitmap to show the amount of damage done, then calls AddAnimatorOnce to add the animator */
           void AddDamageAnimator(int Amount, Point Location);
           //!  Updates all animators
           void Update(int delta);

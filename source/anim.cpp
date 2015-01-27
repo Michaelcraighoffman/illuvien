@@ -59,8 +59,15 @@ void AnimatorController::Update(int delta) {
     for (; currentAnimator != Animators.end(); currentAnimator++) {
         (*currentAnimator)->Update(delta);
     }
-    //Find all the elements which are finished and ready to be removed, then remove them
-    Animators.erase(std::remove_if(Animators.begin(), Animators.end(), [](Animator * a)->bool { return a->IsFinished(); }), Animators.end());
+    //Find all the elements which are finished and ready to be removed
+    auto firstErased = std::remove_if(Animators.begin(), Animators.end(), [](Animator * a)->bool { if (a->IsFinished()) { delete a; return true; } return false; });
+    //for (; firstErased != Animators.end();) {
+    //    //Free the memory associated with them
+    //    delete (*firstErased);
+    //    firstErased = Animators.erase(firstErased);
+    //}
+    //And finally remove them
+    Animators.erase(firstErased, Animators.end());
 }
 void AnimatorController::Render(Point Actual) {
     std::sort(Animators.begin(), Animators.end(), [](Animator *a, Animator *b) { return *a < *b; });

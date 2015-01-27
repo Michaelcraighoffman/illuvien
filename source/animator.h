@@ -83,6 +83,7 @@ public:
     void UpdateAnimator(Point Destination, bool makeIdle=false);
     void UpdateAnimator(int Action, Point Destination, bool makeIdle=false);
     Point GetPosition();
+    Point GetDimensions();
     void MoveTowardsDestination();
     void Update(int delta);
     void Render(Point Actual);

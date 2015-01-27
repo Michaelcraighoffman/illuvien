@@ -112,6 +112,7 @@ void MonsterController::LoadImages(Monster &Out) {
      Out.MonsterAnimator = new Animator();
      Out.MonsterAnimator->Create(ANIM_FULL, Out.MovementSpeed, Path, Out.Spawn);
      Anim->AddAnimator(Out.MonsterAnimator);
+     Out.Size = Out.MonsterAnimator->GetDimensions();
 }
 
 /*
