@@ -80,7 +80,7 @@ void IlluvienMessageBox::Render() {
 }
 void IlluvienMessageBox::RenderString(SDL_Surface * Buffer, int Index) {
      int CurrentPixel=0;
-     SDL_Surface * temptext;
+     SDL_Surface * temptext=nullptr;
      SDL_Rect dest;
      dest.x = 0;
      dest.y = Index*TEXT_HEIGHT;
@@ -90,6 +90,7 @@ void IlluvienMessageBox::RenderString(SDL_Surface * Buffer, int Index) {
          dest.h = temptext->h;
          SDL_BlitSurface(temptext, nullptr, Buffer, &dest);
          dest.x+=temptext->w;
-          
+         SDL_FreeSurface(temptext);
      }
+
 }

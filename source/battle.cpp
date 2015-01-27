@@ -19,8 +19,7 @@
 #include "battle.h"
 
 BattleManager::BattleManager() {
-     Options Opts;
-     Verbosity=Opts.CombatVerbose;
+     Verbosity=Options::CombatVerbose;
 }
 
 BattleResult BattleManager::Battle(BattleInfo Attacker, BattleInfo Defender, int Type) {
